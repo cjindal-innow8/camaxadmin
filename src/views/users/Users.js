@@ -10,7 +10,7 @@ import {
   CRow,
   CPagination
 } from '@coreui/react'
-
+import {getAllUsers} from '../../firebase/firebasedb'
 import usersData from './UsersData'
 
 const getBadge = status => {
@@ -33,12 +33,21 @@ const Users = () => {
     currentPage !== newPage && history.push(`/users?page=${newPage}`)
   }
 
+  const handleClick = async ()=>{
+    console.log("handleClick")
+    const result = await getAllUsers()
+    console.log("getAllUsersgetAllUsers=",result)
+  }
+
   useEffect(() => {
     currentPage !== page && setPage(currentPage)
   }, [currentPage, page])
-
+  
   return (
     <CRow>
+      <CBadge onClick = {handleClick} color='success'>
+                      test
+                    </CBadge>
       <CCol xl={6}>
         <CCard>
           <CCardHeader>
@@ -62,6 +71,7 @@ const Users = () => {
               'status':
                 (item)=>(
                   <td>
+                    {console.log("{getBadge(item.status)=",getBadge(item.status))}
                     <CBadge color={getBadge(item.status)}>
                       {item.status}
                     </CBadge>

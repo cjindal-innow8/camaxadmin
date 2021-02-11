@@ -6,8 +6,8 @@ const _nav =  [
   
   {
     _tag: 'CSidebarNavItem',
-    name: 'Colors',
-    to: '/theme/colors',
+    name: 'Users',
+    to: '/users',
     icon: 'cil-drop',
   },
   
