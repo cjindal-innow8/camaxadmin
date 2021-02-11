@@ -10,6 +10,12 @@ const _nav =  [
     to: '/users',
     icon: 'cil-drop',
   },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'OpenJobs',
+    to: '/openJobs',
+    icon: 'cil-drop',
+  },
   
 ]
 
