@@ -16,7 +16,12 @@ const _nav =  [
     to: '/openJobs',
     icon: 'cil-drop',
   },
-  
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Coupons',
+    to: '/coupons',
+    icon: 'cil-drop',
+  },
 ]
 
 export default _nav

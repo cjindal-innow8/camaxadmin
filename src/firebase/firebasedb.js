@@ -9,6 +9,8 @@ export const SCHEMA = {
   APPLICANTS : 'applicants',
   POSTBYCAMAX : 'postbycamax',
   PRODUCTS : 'products',
+  COUPONS : 'coupons',
+
 };
 
  /**
@@ -45,29 +47,30 @@ export const SCHEMA = {
    * 
    *
    */
-  export const getApplicantsForJob = async (data) => {
-    const result = await database.ref(SCHEMA.APPLICANTS ).where()
-    // return new Promise (async (resolve)=>{
-    //  const result =  await database.ref(SCHEMA.APPLICANTS + "/")
-    //  .once("value")
-    //  if (result) {
-    //    let data = []
-    //    const values = result.val()
-    //    const keys = values && Object.keys(values)
-    //    keys.forEach(key=>{
-    //      let res= values[key]
-    //      res = {
-    //        ...res,
-    //        id : key
-    //      }
-    //      data.push(res)
-    //    })
-    //    resolve(data)
-    //  } else {
-    //    resolve(null)
-    //  }
+  export const getApplicantsForJob = async (jobId) => {
+   
+    return new Promise (async (resolve)=>{
+     const result =  await database.ref(SCHEMA.APPLICANTS).orderByChild("jobId")
+     .equalTo(jobId).once("value")
+     if (result) {
+       let data = []
+       const values = result.val()
+       console.log("valuesvalues=",values)
+       const keys = values && Object.keys(values)
+       keys && keys.forEach(key=>{
+         let res= values[key]
+         res = {
+           ...res,
+           id : key
+         }
+         data.push(res)
+       })
+       resolve(data)
+     } else {
+       resolve(null)
+     }
 
-    // })
+    })
    
  };
 
@@ -104,6 +107,48 @@ export const getAllUsers = () => {
   };
 
 
+  /**
+   * @method addCoupon : To add coupon
+   * @param {object} data : values to be added
+   *
+   */
+  export const addCoupon = async (data,callback) => {
+    await database.ref(SCHEMA.COUPONS + "/").push(data)
+    callback(true)
+  };
+
+
+  /**
+   * @method getAllCoupons : To add coupon
+   * 
+   *
+   */
+  export const getAllCoupons = async (data,callback) => {
+    return new Promise (async (resolve)=>{
+      const result =  await database.ref(SCHEMA.COUPONS + "/").once("value")
+      if (result) {
+        let data = []
+        const values = result.val()
+        const keys = values && Object.keys(values)
+        keys.forEach(key=>{
+          let res= values[key]
+          res = {
+            ...res,
+            id : key
+          }
+          data.push(res)
+        })
+        resolve(data)
+      } else {
+        resolve(null)
+      }
+
+     })
+  };
+
+
+
+
 /**
    * @method deleteCAMAXPost : To delete post by CAMAX
    * @param {object} id : values to be added
@@ -125,6 +170,36 @@ export const getAllUsers = () => {
    await database.ref(SCHEMA.POSTBYCAMAX + "/" + id).update(dataToUpdate)
    callback(true)
  };
+
+ /**
+   * @method getProducts : get user's licences
+   * 
+   *
+   */
+   export const  getProducts = () => {
+    //  console.log("datadatadatadata=",data)
+    return new Promise(async (resolve) => {
+      const result = await database.ref(SCHEMA.PRODUCTS).once("value")
+      if (result) {
+        let data = []
+        const values = result.val()
+        const keys = values && Object.keys(values)
+        keys.forEach(key => {
+          let res = values[key]
+          res = {
+            ...res,
+            id: key
+          }
+          data.push(res)
+        })
+        resolve(data)
+      }
+      else {
+        resolve(null)
+      }
+    })
+  }
+
 
 /**
    * @method getAllPostByCAMAX : To get all  post added by CAMAX
@@ -265,11 +340,32 @@ export const updateStatusOfEmployeePost = async (id,status,callback)=>{
     });
   };
 
-export const addNewLicenecForUesr =(userId, data)=>{
+  // updateUserLicence
+
+  export const updateUserLicence = async (userId, data, callback)=>{
+    const licenceNo = data.id
+    await database
+    .ref(SCHEMA.USERS + "/" + userId + "/licence/" + licenceNo)
+    .update(data);
+    callback(true)
+  }
+
+  export const deleteUserLicenceKey = async (userId, licenceKey, callback)=>{
+    const licenceNo = licenceKey
+    await database
+    .ref(SCHEMA.USERS + "/" + userId + "/licence/" + licenceNo)
+    .remove();
+    callback(true)
+  }
+
+
+
+export const addNewLicenecForUesr = async (userId, data, callback)=>{
   const licenceNo = data.id
-  database
+  await database
   .ref(SCHEMA.USERS + "/" + userId + "/licence/" + licenceNo)
   .update(data);
+  callback(true)
 }
 
  /**

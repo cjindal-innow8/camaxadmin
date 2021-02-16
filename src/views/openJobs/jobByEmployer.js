@@ -73,7 +73,8 @@ function JobByEmployer(props) {
         {
           employerPost && employerPost.map((employer, index) => {
             const { description, ctc, email, experience, jobTitle, companyName, phone, status } = employer
-            return (<tr key = {index}>
+            return (
+            <tr key = {index}>
               <td> {companyName} </td>
               <td> {email} </td>
               <td> {phone} </td>
@@ -90,7 +91,8 @@ function JobByEmployer(props) {
               </td>
               <td> <CButton color = "danger" onClick = {()=>{deletePost(index)}}> Delete</CButton> </td>
               
-            </tr>)
+            </tr>
+            )
           })
         }
 

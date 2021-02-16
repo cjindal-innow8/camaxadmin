@@ -17,12 +17,15 @@ function JobContainer(props) {
           jobs && jobs.map((job, index)=>{
             const { experience, jobTitle } = job
             return (
-              <tr key = {index} onClick = {()=>{
+              <tr key = {index} >
+              <td onClick = {()=>{
                 getJob(job)
                 toggleJob();
-                }}>
-              <td> {jobTitle} </td>
-              <td> {experience} </td>
+                }}> {jobTitle} </td>
+              <td onClick = {()=>{
+                getJob(job)
+                toggleJob();
+                }}> {experience} </td>
               <td> <CButton color = "primary" onClick = {()=>{editJob(index)}}> Edit</CButton> </td>
               <td> <CButton color = "danger" onClick = {()=>{deleteJob(index)}}> Delete</CButton> </td>
             </tr>

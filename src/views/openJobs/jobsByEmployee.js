@@ -78,9 +78,9 @@ function JobsByEmployee(props) {
               <td> {about} </td>
               <td> {
                 (status === "pending") ? <>
-                  <lebel onClick={() => { changeStatus(index,'Accept') }}> Accept</lebel>
+                  <lebel onClick={() => { changeStatus(index,'Accepted') }}> Accept</lebel>
                   <lebel> /</lebel>
-                  <lebel onClick={() => { changeStatus(index,"Reject") }}> Reject</lebel>
+                  <lebel onClick={() => { changeStatus(index,"Rejected") }}> Reject</lebel>
                 </> : <lebel> {status}</lebel>}
               </td>
               <td> <CButton color = "danger"onClick = {()=>{deletePost(index)}}> Delete</CButton> </td>

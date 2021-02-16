@@ -8,7 +8,8 @@ import {
   CCol,
   CDataTable,
   CRow,
-  CPagination
+  CPagination,
+  CInput
 } from '@coreui/react'
 import {getAllUsers} from '../../firebase/firebasedb'
 // import usersData from './UsersData'
@@ -23,35 +24,25 @@ const getBadge = status => {
   }
 }
 
-const Users = () => {
+const Users = (props) => {
   const history = useHistory()
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
   const currentPage = Number(queryPage && queryPage[1] ? queryPage[1] : 1)
   const [page, setPage] = useState(currentPage)
   const [usersData,setuserData] = useState([])
   const [headings , setHeadings] = useState([])
-  const title =  ["username","email","companyName","gstInNumber"]
+  const title =  ["username","email","phone","companyName","gstInNumber"]
 
-  const pageChange = newPage => {
-    currentPage !== newPage && history.push(`/users?page=${newPage}`)
-  }
+  // const pageChange = newPage => {
+  //   currentPage !== newPage && history.push(`/users?page=${newPage}`)
+  // }
+  
   const getUserData = async()=>{
     const result = await getAllUsers()
     console.log("getAllUsersgetAllUsers=",result)
-    // console.log("titletitletitle=",title)
-    // Object.delete("address")
     setuserData(result)
   }
-//   0: "address"
-// 1: "city"
-// 2: "companyName"
-// 3: "country"
-// 4: "email"
-// 5: "gstInNumber"
-// 6: "role"
-// 7: "state"
-// 8: "uid"
-// 9: "username"
+
 
   const handleClick = async ()=>{
     console.log("handleClick")
@@ -63,60 +54,42 @@ const Users = () => {
     getUserData()
   },[])
 
+  const goToUser = (user)=>{
+    console.log("useruser=",user)
+    props.history.push(`/user/${user.uid}`)
+  }
+
   useEffect(() => {
     currentPage !== page && setPage(currentPage)
   }, [currentPage, page])
   
   return (
-    <CRow>
-      <CBadge onClick = {handleClick} color='success'>
-                      test
-                    </CBadge>
-      <CCol xl={6}>
-        <CCard>
-          <CCardHeader>
-            Users
-            <small className="text-muted"> example</small>
-          </CCardHeader>
-          <CCardBody>
-          <CDataTable
-            items={usersData}
-            // fields={[
-            //   { key: 'name', _classes: 'font-weight-bold' },
-            //   'registered', 'role', 'status'
-            // ]}
-            fields={[
-             ...title
-            ]}
-            hover
-            striped
-            itemsPerPage={5}
-            activePage={page}
-            clickableRows
-            onRowClick={(item) => history.push(`/users/${item.uid}`)}
-            scopedSlots = {{
-              'status':
-                (item)=>(
-                  <td>
-                    {console.log("{getBadge(item.status)=",getBadge(item.status))}
-                    <CBadge color={getBadge(item.status)}>
-                      {item.status}
-                    </CBadge>
-                  </td>
-                )
-            }}
-          />
-          <CPagination
-            activePage={page}
-            onActivePageChange={pageChange}
-            pages={5}
-            doubleArrows={false} 
-            align="center"
-          />
-          </CCardBody>
-        </CCard>
-      </CCol>
-    </CRow>
+   <div>
+     <CInput />
+    <table className="table table-striped table-hover">
+        <tr >
+          <th> FullName </th>
+          <th> Email </th>
+          <th> Phone </th>
+          <th> Company Name </th>
+          <th> GSTInNumber </th>
+        </tr >
+        {
+          usersData && usersData.map((user, index) => {
+            const { username, email, companyName, phone ,gstInNumber} = user
+            return (
+            <tr key = {index} onClick = {()=>{goToUser(user)}}>
+              <td> {username} </td>
+              <td> {email} </td>
+              <td> {phone?phone:'0987654321'} </td>
+              <td> {companyName} </td>
+              <td> {gstInNumber} </td>
+            </tr>
+            )
+          })
+        }
+     </table>
+    </div>
   )
 }
 
