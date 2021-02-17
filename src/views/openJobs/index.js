@@ -143,6 +143,7 @@ const Tabs = () => {
      addCAMAXPost(data,(res)=>{
       if(res){
       Alert(200, "Job Added Successfully!!");
+
       }
     })
     setFields(formDetail)
@@ -166,30 +167,25 @@ const Tabs = () => {
             {/* <DocsLink name="CTabs"/> */}
           {/* </CCardHeader> */}
           {/* <CCardBody> */}
-          <CButton color = "primary" onClick = {()=>{setIsOpen(true)}}> Add Job </CButton>
-      <AddJob value = {fields} isOpen = {isOpen} onToggle = {onToggle} onChange = {handleChange}
+          {/* <CButton color = "primary" onClick = {()=>{setIsOpen(true)}}> Add Job </CButton> */}
+      {/* <AddJob value = {fields} isOpen = {isOpen} onToggle = {onToggle} onChange = {handleChange}
       onAdd = {handleAdd}
-      values = {fields}/>
+      values = {fields}/> */}
             <CTabs>
               <CNav variant="tabs">
                 <CNavItem>
                   <CNavLink>
-                  JobByEmployee
+                  Job Seeker Profile
                   </CNavLink>
                 </CNavItem>
                 <CNavItem>
                   <CNavLink>
-                  JobByEmployer
+                  Posts From Recruiters
                   </CNavLink>
                 </CNavItem>
                 <CNavItem>
                   <CNavLink>
-                  JobByCAMAX
-                  </CNavLink> 
-                </CNavItem>
-                <CNavItem>
-                  <CNavLink>
-                  Applicants
+                  Jobs At CAMAX
                   </CNavLink> 
                 </CNavItem>
               </CNav>
@@ -204,7 +200,7 @@ const Tabs = () => {
                       { !isShowJobs ?  <JobByCAMAX toggleJob={toggleJob} getJob={getJob}/> : <Jobdetail toggleJob={toggleJob} job= {job}/>}
                 </CTabPane>
                 <CTabPane>
-                         <Applicants/>
+                         {/* <Applicants/> */}
                 </CTabPane>
               </CTabContent>
             </CTabs>

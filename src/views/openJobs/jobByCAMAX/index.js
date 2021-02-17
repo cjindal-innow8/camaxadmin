@@ -1,6 +1,9 @@
 import React , { useEffect, useState } from 'react';
 import JobContainer from './component'
-import {getAllPostByCAMAX,updateCAMAXPost,deleteCAMAXPost} from '../../../firebase/firebasedb'
+import {
+  CButton
+ } from '@coreui/react'
+import {getAllPostByCAMAX,updateCAMAXPost,deleteCAMAXPost,addCAMAXPost} from '../../../firebase/firebasedb'
 import Alert from '../../../utilities/Alerts'
 const formDetail = {
   jobTitle : '',
@@ -11,6 +14,7 @@ function JobByCAMAX(props) {
   const [isOpen, setIsOpen] = useState(false)
   const [fields, setFields] = useState(formDetail);
   const [idToUpdate, setIdToUpdate] = useState()
+  const [isUpdate, setIsUpdate] = useState(false)
   const {toggleJob,getJob} = props
   useEffect(() => {
     getCAMAXPost ()
@@ -49,6 +53,24 @@ const editJob = (index)=>{
   })
   setIsOpen(true)
   setIdToUpdate(job.id)
+  setIsUpdate(true)
+}
+const handleAdd = ()=>{
+  const {jobTitle, experience} = fields;
+  if (!jobTitle || !experience 
+  ) {
+    Alert(400, "All fields are required !!");
+    return;
+  }
+  const data = fields
+   addCAMAXPost(data,(res)=>{
+    if(res){
+    Alert(200, "Job Added Successfully!!");
+    getCAMAXPost ()
+    }
+  })
+  setFields(formDetail)
+  setIsOpen(false)
 }
 
 const handleChange = (event) => {
@@ -73,9 +95,19 @@ const handleChange = (event) => {
 }
 
    return (
+     <>
+     <div className="text-right my-2">
+     <CButton color = "primary" onClick = {()=>{
+       setIsOpen(true)
+       setFields(formDetail)
+       setIsUpdate(false)
+       }}> Add Job </CButton>
+     </div>
+    
    <JobContainer jobs = {jobs}  deleteJob = {deleteJob} 
    toggle = {toggle}
-   editJob = {editJob} isOpen= {isOpen} handleChange = {handleChange} values = {fields} isUpdate = {true} updateJob = {updateJob} toggleJob= {toggleJob} getJob={getJob}/>
+   editJob = {editJob} isOpen= {isOpen} handleChange = {handleChange} values = {fields} isUpdate = {isUpdate} updateJob = {updateJob} toggleJob= {toggleJob} getJob={getJob} onAdd = {handleAdd}/>
+   </>
   );
   
 }

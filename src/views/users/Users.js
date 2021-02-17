@@ -23,7 +23,7 @@ const getBadge = status => {
     default: return 'primary'
   }
 }
-
+let intialData ;
 const Users = (props) => {
   const history = useHistory()
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
@@ -31,23 +31,12 @@ const Users = (props) => {
   const [page, setPage] = useState(currentPage)
   const [usersData,setuserData] = useState([])
   const [headings , setHeadings] = useState([])
-  const title =  ["username","email","phone","companyName","gstInNumber"]
-
-  // const pageChange = newPage => {
-  //   currentPage !== newPage && history.push(`/users?page=${newPage}`)
-  // }
-  
+ 
   const getUserData = async()=>{
     const result = await getAllUsers()
     console.log("getAllUsersgetAllUsers=",result)
+    intialData = result
     setuserData(result)
-  }
-
-
-  const handleClick = async ()=>{
-    console.log("handleClick")
-    const result = await getAllUsers()
-    console.log("getAllUsersgetAllUsers=",result)
   }
   useEffect(()=>{
     console.log("useEffectuseEffect")
@@ -59,14 +48,39 @@ const Users = (props) => {
     props.history.push(`/user/${user.uid}`)
   }
 
-  useEffect(() => {
-    currentPage !== page && setPage(currentPage)
-  }, [currentPage, page])
+  const handleSearch = (e)=>{
+   const value = e.target.value
+   if(value.length >= 3){
+    const nameFilter = usersData.filter(el=>{
+      const username = el.username.toLowerCase()
+      const val = value.toLowerCase()
+      return username.includes(val)
+    })
+    const  emailFilter = usersData.filter(el=>{
+      const email = el.email.toLowerCase()
+      const val = value.toLowerCase()
+      return email.includes(val)
+    })
+    const  phoneFiter = usersData.filter(el=>{
+      const phone = el.phone && el.phone.toString().toLowerCase() ||''
+      const val = value.toLowerCase()
+      return phone.includes(val)
+    })
+    console.log("nameFilternameFilter=",nameFilter,emailFilter)
+    const dataToSet =( nameFilter && nameFilter.length > 0) ? nameFilter : (emailFilter && emailFilter.length > 0) ? emailFilter : (phoneFiter && phoneFiter.length > 0) ? phoneFiter :[]
+    setuserData(dataToSet)
+   }else{
+    setuserData(intialData)
+   }
+  }
+
   
   return (
    <div>
-     <CInput />
-    <table className="table table-striped table-hover">
+     <div>
+     <CInput className="search-input" onChange = {handleSearch} placeholder = "Search" />
+     </div>
+   { (usersData && usersData.length > 0) ?  <table className="table table-striped table-hover">
         <tr >
           <th> FullName </th>
           <th> Email </th>
@@ -89,6 +103,10 @@ const Users = (props) => {
           })
         }
      </table>
+     : <div> 
+      No Data
+      </div>
+     }
     </div>
   )
 }

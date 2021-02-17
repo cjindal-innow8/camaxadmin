@@ -8,17 +8,37 @@ import {
   CDataTable,
   CRow,CButton
 } from '@coreui/react'
+import {acceptJobTemplate} from '../../utilities/emailTemplates/jobRequestAccepted'
+import {rejectJobTemplate} from '../../utilities/emailTemplates/jobRequestRejected'
+import AcceptJobModal from './acceptJobModal'
 import Alert from "../../utilities/Alerts"
+import {sendMail} from '../../utilities/sendEmail'
+import RejectJobModal from './rejectJobModal'
 import {getAllPostByEmployee,deleteEmployeePost,updateStatusOfEmployeePost} from "../../firebase/firebasedb"
+// var acceptionEmailTemplate = require('../../utilities/emailTemplates/jobRequestAccepted.js');
+// var rejectionTemplate = require('../../utilities/emailTemplates/jobRequestRejected.js');
+
 function JobsByEmployee(props) {
   const [employeePost, setEmployeePost] = useState([])
-
+  const [openAccept , setOpenAccept] = useState(false)
+  const [openReject , setOpenReject] = useState(false)
+  const [indexToUpdate , setIndexToUpdate] = useState(-1)
+  const [statusToUpdate, setStatusToUpdate] = useState('')
+  const [rejectionReason, setRejectionReason] = useState()
   useEffect(() => {
     getEmployeePost()
+    // sendMailToEmployee(acceptJobTemplate)
   }, [])
   const getEmployeePost = async () => {
     const result = await getAllPostByEmployee()
     setEmployeePost(result)
+  }
+
+  const toggleAcceptModal = ()=>{
+    setOpenAccept(!openAccept)
+  }
+  const toggleRejectModal = ()=>{
+    setOpenReject(!openReject)
   }
 
   const  deletePost = (index)=>{
@@ -32,16 +52,46 @@ function JobsByEmployee(props) {
       }
     })
    }
-  const changeStatus = (index,status) => {
+  const changeStatus = () => {
     const newArray = employeePost.slice()
-    let employee = newArray[index]
-    const id = employee.id
-    newArray[index] = {
-      ...employee,
-      status : status
+    if(openReject && !rejectionReason){
+      Alert(400, "Please enter reason !!")
+        return
     }
-    setEmployeePost(newArray)
-    updateStatus(id,status.toLowerCase())
+    if(indexToUpdate !== -1){
+      let employee = newArray[indexToUpdate]
+      const id = employee.id
+      const email = employee.email
+      newArray[indexToUpdate] = {
+        ...employee,
+        status : statusToUpdate
+      }
+      setEmployeePost(newArray)
+      setOpenAccept(false)
+      setOpenReject(false)
+      setRejectionReason('')
+      updateStatus(id,statusToUpdate.toLowerCase())
+      sendMailToEmployee(email)
+    }
+  }
+  const sendMailToEmployee = (email)=>{
+    // const content = `<div><p>Name: <b>${name}</b></p><p>Email: <b>${email}</b></p><p>Phone: <b>${phone}</b></p><p>Services: <b>${serviceType}</b></p><p>Message:</p><p>${message}</p></div>`;
+    const values = (statusToUpdate ==="Rejected") ? {reason:rejectionReason} : ""
+    const template = (statusToUpdate ==="Rejected") ? rejectJobTemplate :acceptJobTemplate
+    const content = template(values)
+    const data = {
+      from :"mmahajaninnow8@gmail.com",
+      to: 'mparchainnow8@gmail.com',
+      subject: "Inquiry from CaMax",
+      content,
+    };
+    sendMail(data)
+    .then(() => {
+      Alert(200, "Email sent successfully.");
+    })
+    .catch(() => {
+      Alert(400, "Unable to send email at this time.");
+    });
   }
 
   const updateStatus = (id,status)=>{
@@ -54,16 +104,18 @@ function JobsByEmployee(props) {
 
   return (
     <div>
-            <table className="table table-striped table-hover">
+      { (employeePost && employeePost.length >  0) ?
+      <>
+          <table className="table table-striped table-hover">
             <tr>
-          <td> Name </td>
-          <td> Email </td>
-          <td> Phone </td>
-          <td> JobTitle </td>
-          <td> CTC </td>
-          <td> Experience </td>
-          <td> About </td>
-          <td> Status </td>
+          <th> Name </th>
+          <th> Email </th>
+          <th> Phone </th>
+          <th> JobTitle </th>
+          <th> CTC </th>
+          <th> Experience </th>
+          <th> About </th>
+          <th> Status </th>
         </tr>
         {
           employeePost && employeePost.map((employee, index) => {
@@ -78,16 +130,35 @@ function JobsByEmployee(props) {
               <td> {about} </td>
               <td> {
                 (status === "pending") ? <>
-                  <lebel onClick={() => { changeStatus(index,'Accepted') }}> Accept</lebel>
-                  <lebel> /</lebel>
-                  <lebel onClick={() => { changeStatus(index,"Rejected") }}> Reject</lebel>
-                </> : <lebel> {status}</lebel>}
+                  <CBadge color = "success" onClick={() => { 
+                    setOpenAccept(true)
+                    setIndexToUpdate(index)
+                    setStatusToUpdate('Accepted')
+                    }}> Accept</CBadge>
+                  <lebel> / </lebel>
+                  <CBadge color = "danger" onClick={() => { 
+                    setOpenReject(true)
+                    setIndexToUpdate(index)
+                    setStatusToUpdate('Rejected')
+                    // changeStatus(index,"Rejected")
+                    
+                    }}> Reject</CBadge>
+                </> : <CBadge color = {(status ==="accepted") ? "success":"danger"}> {status.charAt(0).toUpperCase()+status.slice(1)}</CBadge>}
               </td>
               <td> <CButton color = "danger"onClick = {()=>{deletePost(index)}}> Delete</CButton> </td>
             </tr>)
           })
         }
-              </table>
+          </table>
+          <AcceptJobModal isOpen = {openAccept} changeStatus = {changeStatus} toggleAcceptModal = {toggleAcceptModal}/>
+          <RejectJobModal isOpen = {openReject} rejectionReason = {rejectionReason} setRejectionReason = {setRejectionReason} 
+          toggleRejectModal = {toggleRejectModal}
+          changeStatus = {changeStatus}/>
+          </>
+            : <div> 
+                No Data
+              </div>  
+            }
     </div>
   );
 }

@@ -32,14 +32,14 @@ import {
   }
 
 function AddJob(props) {
-  const { isOpen, onToggle, values,onChange,onAdd,isUpdate,updateJob} = props
+  const { isOpen, onToggle, values,onChange,onAdd,isUpdate,updateJob,} = props
   return (
     <div>
       
    <CModal
        show={isOpen} 
        onClose={onToggle}
-      // centered
+      centered
     >
        <CModalHeader closeButton>
                 <CModalTitle>Add New JOB</CModalTitle>
@@ -51,7 +51,7 @@ function AddJob(props) {
               const field = inputFiels[key]
               return (
                 <CCol >
-                  <label>{field.label}</label>
+                  <label>{field.label} <span className="required">*</span></label>
                   <CInput 
                     value={values[key]}
                     type={field.type} 
@@ -61,6 +61,7 @@ function AddJob(props) {
               )
             })}
           </CRow>
+          <div className="mt-3 text-center add-btn">
           <CButton color = "primary" onClick = {()=>{
            if(!isUpdate){
              onAdd()
@@ -69,6 +70,8 @@ function AddJob(props) {
            }
           }
             }> {isUpdate ? "Update":"Add"}</CButton>
+          </div>
+         
        
       </CModalBody>
     </CModal>

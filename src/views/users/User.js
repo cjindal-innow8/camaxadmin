@@ -138,9 +138,7 @@ const User = (props) => {
   };
 
   const handleEdit = (index)=>{
-    
     const newArray = licences.slice()
-    console.log("newArraynewArraynewArray",newArray[index])
     const data = {
       licenceKey: newArray[index].id,
       productName: newArray[index].productName,
@@ -155,7 +153,6 @@ const User = (props) => {
     const newArray = licences.slice()
     const licenceKey = newArray[index].id
     const userId = userData && userData[0].uid
-    console.log("licenceKeylicenceKey",licenceKey)
     deleteLicence(userId,licenceKey)
     
   }
@@ -171,6 +168,7 @@ const User = (props) => {
   
   const handleClick = async () => {
     setIsOpen(true)
+    setIsEdit(false)
     getLicenceKey()
   }
 
@@ -212,7 +210,8 @@ const User = (props) => {
       <CRow>
         <CCol>
           <UserLicences licences={licences} handleClick={handleClick} handleEdit = {handleEdit} handleDelete = {handleDelete}/>
-          <AddLicenceModal isOpen={isOpen} availableProduct={availableProduct} values={fields} handleChange={handleChange} toggleModal={toggleModal} OnAdd={OnAdd} changeDate = {changeDate} />
+          <AddLicenceModal isOpen={isOpen} availableProduct={availableProduct} values={fields} isEdit={isEdit}
+          handleChange={handleChange} toggleModal={toggleModal} OnAdd={OnAdd} changeDate = {changeDate} />
         </CCol>
       </CRow>
     </>

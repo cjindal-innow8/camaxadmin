@@ -4,14 +4,18 @@ import {
 } from '@coreui/react'
 import AddJob from './addJob'
 function JobContainer(props) {
-  const {jobs,deleteJob, toggleJob,isOpen,editJob,handleChange,values,toggle,isUpdate,updateJob, getJob} = props 
+  const {jobs,deleteJob, toggleJob,isOpen,editJob,handleChange,values,toggle,isUpdate,updateJob, getJob,onAdd} = props 
   return (
     <div>
-     
-        <table className="table table-striped table-hover">
+       
+        {
+          (jobs && jobs.length > 0) ?
+          <table className="table table-striped table-hover">
         <tr>
-          <td> Job Title </td>
-          <td> Experience </td>
+          <th> Job Title </th>
+          <th> Experience </th>
+          <th></th>
+          <th></th>
         </tr>
         {
           jobs && jobs.map((job, index)=>{
@@ -33,7 +37,11 @@ function JobContainer(props) {
           })
         }
       </table>
-      <AddJob  isOpen ={isOpen} onChange = {handleChange}  values = {values} onToggle = {toggle} isUpdate= {isUpdate} updateJob={updateJob}/>
+      : <div> 
+      No Data
+    </div> 
+      }
+      <AddJob  isOpen ={isOpen} onChange = {handleChange} onAdd = {onAdd} values = {values} onToggle = {toggle} isUpdate= {isUpdate} updateJob={updateJob}/>
     </div>
   );
 }
