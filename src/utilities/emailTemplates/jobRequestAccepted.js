@@ -1,5 +1,6 @@
 import LOGOURL from '../../assets/images/logo.png'
 export const acceptJobTemplate = (data) =>{
+   const {postType,audience} = data
    try {
       return(
          `
@@ -33,7 +34,8 @@ export const acceptJobTemplate = (data) =>{
          <tr>
             <td>
                <h6 style="font-size: 18px;line-height: 28px; font-weight: 600;    margin-top: 0;
-                  margin-bottom: 29px;">Your Request for job has been approved by CAMAX. It will be visible on CAMAX website for next 7 days</h6>
+                  margin-bottom: 29px;">CAMAX Admin has approved your job ${postType}.Your application will be visible to various ${audience} for next 7 days</h6>
+                  <p>Best Wishes</p>
             </td>  
          </tr>
       </table>

@@ -8,6 +8,7 @@ import {
   CDataTable,
   CRow,CButton
 } from '@coreui/react'
+import ReadMoreReact from '../../utilities/readMore'
 import {acceptJobTemplate} from '../../utilities/emailTemplates/jobRequestAccepted'
 import {rejectJobTemplate} from '../../utilities/emailTemplates/jobRequestRejected'
 import AcceptJobModal from './acceptJobModal'
@@ -27,7 +28,7 @@ function JobsByEmployee(props) {
   const [rejectionReason, setRejectionReason] = useState()
   useEffect(() => {
     getEmployeePost()
-    // sendMailToEmployee(acceptJobTemplate)
+    
   }, [])
   const getEmployeePost = async () => {
     const result = await getAllPostByEmployee()
@@ -76,7 +77,7 @@ function JobsByEmployee(props) {
   }
   const sendMailToEmployee = (email)=>{
     // const content = `<div><p>Name: <b>${name}</b></p><p>Email: <b>${email}</b></p><p>Phone: <b>${phone}</b></p><p>Services: <b>${serviceType}</b></p><p>Message:</p><p>${message}</p></div>`;
-    const values = (statusToUpdate ==="Rejected") ? {reason:rejectionReason} : ""
+    const values = (statusToUpdate ==="Rejected") ? {reason:rejectionReason} : {postType : "application",audience:"recruiters"}
     const template = (statusToUpdate ==="Rejected") ? rejectJobTemplate :acceptJobTemplate
     const content = template(values)
     const data = {
@@ -120,6 +121,7 @@ function JobsByEmployee(props) {
         {
           employeePost && employeePost.map((employee, index) => {
             const { about, ctc, email, experience, jobTitle, name, phone, status } = employee
+            {console.log("statusstatusstatus=",status)}
             return (<tr key = {index}>
               <td> {name} </td>
               <td> {email} </td>
@@ -127,21 +129,22 @@ function JobsByEmployee(props) {
               <td> {jobTitle} </td>
               <td> {ctc} </td>
               <td> {experience} </td>
-              <td> {about} </td>
+              <td> < ReadMoreReact text = {about}/>  </td>
               <td> {
+                
                 (status === "pending") ? <>
                   <CBadge color = "success" onClick={() => { 
                     setOpenAccept(true)
                     setIndexToUpdate(index)
-                    setStatusToUpdate('Accepted')
+                    setStatusToUpdate('accepted')
                     }}> Accept</CBadge>
                   <lebel> / </lebel>
                   <CBadge color = "danger" onClick={() => { 
                     setOpenReject(true)
                     setIndexToUpdate(index)
-                    setStatusToUpdate('Rejected')
+                    setStatusToUpdate('rejected')
                     // changeStatus(index,"Rejected")
-                    
+                   
                     }}> Reject</CBadge>
                 </> : <CBadge color = {(status ==="accepted") ? "success":"danger"}> {status.charAt(0).toUpperCase()+status.slice(1)}</CBadge>}
               </td>

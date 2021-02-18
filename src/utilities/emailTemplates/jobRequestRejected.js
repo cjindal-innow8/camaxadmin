@@ -35,7 +35,7 @@ return (
             <td>
                <h6 style="font-size: 18px;line-height: 28px; font-weight: 600;    margin-top: 0;
                   margin-bottom: 29px;">Your Request for job has been rejected by CAMAX due to</h6>
-                  <p>${reason} </p>
+                  <p> Reason : ${reason} </p>
             </td>  
          </tr>
       </table>
