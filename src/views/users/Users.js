@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import Loader from '../../utilities/loader/index.js'
+import Pagination from "react-js-pagination";
 import {
   CBadge,
   CCard,
@@ -11,7 +13,7 @@ import {
   CPagination,
   CInput
 } from '@coreui/react'
-import {getAllUsers} from '../../firebase/firebasedb'
+import {getAllUsers,getTotalUser} from '../../firebase/firebasedb'
 // import usersData from './UsersData'
 // {id: 0, name: 'John Doe', registered: '2018/01/01', role: 'Guest', status: 'Pending'}
 const getBadge = status => {
@@ -24,24 +26,37 @@ const getBadge = status => {
   }
 }
 let intialData ;
+let limit = 3
 const Users = (props) => {
   const history = useHistory()
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
-  const currentPage = Number(queryPage && queryPage[1] ? queryPage[1] : 1)
-  const [page, setPage] = useState(currentPage)
+  // const currentPage = Number(queryPage && queryPage[1] ? queryPage[1] : 1)
+  const [page, setPage] = useState(1)
+  const [totaldata, setTotalData] = useState()
   const [usersData,setuserData] = useState([])
   const [headings , setHeadings] = useState([])
  
-  const getUserData = async()=>{
-    const result = await getAllUsers()
+  const getUserData = async(pageNumber)=>{
+    const offset = (pageNumber - 1) *  limit 
+    const result = await getAllUsers(offset,limit)
     console.log("getAllUsersgetAllUsers=",result)
     intialData = result
-    setuserData(result)
+    setuserData(result.data)
+    setTotalData(result.totalData)
+  }
+  const getUserCount = ()=>{
+    getTotalUser()
   }
   useEffect(()=>{
-    console.log("useEffectuseEffect")
-    getUserData()
+    getUserCount()
+    getUserData(page)
   },[])
+  
+  const pageChange = (pagenumber)=>{
+    setPage(pagenumber)
+    getUserData(pagenumber)
+
+  }
 
   const goToUser = (user)=>{
     console.log("useruser=",user)
@@ -66,7 +81,6 @@ const Users = (props) => {
       const val = value.toLowerCase()
       return phone.includes(val)
     })
-    console.log("nameFilternameFilter=",nameFilter,emailFilter)
     const dataToSet =( nameFilter && nameFilter.length > 0) ? nameFilter : (emailFilter && emailFilter.length > 0) ? emailFilter : (phoneFiter && phoneFiter.length > 0) ? phoneFiter :[]
     setuserData(dataToSet)
    }else{
@@ -74,13 +88,17 @@ const Users = (props) => {
    }
   }
 
-  
+  console.log("usersDatausersData=",usersData)
   return (
    <div>
      <div>
+       
      <CInput className="search-input" onChange = {handleSearch} placeholder = "Search" />
      </div>
-   { (usersData && usersData.length > 0) ?  <table className="table table-striped table-hover">
+     {/* <Loader/> */}
+   { (usersData && usersData.length > 0) ?  
+   <>
+   <table className="table table-striped table-hover">
         <tr >
           <th> FullName </th>
           <th> Email </th>
@@ -95,14 +113,26 @@ const Users = (props) => {
             <tr key = {index} onClick = {()=>{goToUser(user)}}>
               <td> {username} </td>
               <td> {email} </td>
-              <td> {phone?phone:'0987654321'} </td>
-              <td> {companyName} </td>
-              <td> {gstInNumber} </td>
+              <td> {phone?phone:'--'} </td>
+              <td> {companyName || "--"} </td>
+              <td> {gstInNumber || '--'} </td>
             </tr>
             )
           })
         }
      </table>
+     <Pagination
+     className="mt-3 mx-auto w-fit-content"
+     itemClass="page-item"
+     linkClass="page-link"
+     activeClass="active"
+     activePage={page}
+     itemsCountPerPage={limit}
+     totalItemsCount={totaldata}
+    //  pageRangeDisplayed={5}
+     onChange={pageChange}
+   />
+   </>
      : <div> 
       No Data
       </div>

@@ -13,6 +13,8 @@ export const SCHEMA = {
 
 };
 
+let lastVisible = ''
+
  /**
    * @method getAllApplicants : To add post by CAMAX
    * 
@@ -74,7 +76,9 @@ export const SCHEMA = {
    
  };
 
+ export const getTotalUser = ()=>{
 
+ }
 
 
 
@@ -84,16 +88,42 @@ export const SCHEMA = {
    *
    * @returns Promise that resolves or rejects query
    */
-export const getAllUsers = () => {
-  return new Promise((resolve, reject) => {
-    try {
-      database.ref(SCHEMA.USERS).once("value", (snapshot) => {
-        resolve(Object.values(snapshot.val() || {}));
-      });
-    } catch (error) {
-      reject(error);
-    }
-  });
+export const getAllUsers = (offset, limit) => {
+  console.log("lastVisiblelastVisible=",lastVisible)
+  if(!lastVisible){
+    console.log("iffffffffffff")
+
+    return new Promise((resolve, reject) => {
+      try {
+        database.ref(SCHEMA.USERS).orderByKey().limitToFirst(limit).once("value", (snapshot) => {
+          const values = snapshot.val() || {}
+          const data = Object.values(values)||[]
+          const keys = Object.keys(values) || []
+          lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+          resolve({totalData :data.length ,data});
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }else {
+    console.log("elseeeee")
+    return new Promise((resolve, reject) => {
+      try {
+        database.ref(SCHEMA.USERS).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value", (snapshot) => {
+          const values = snapshot.val() || {}
+          const data = Object.values(values)||[]
+          const keys = Object.keys(values) || []
+          lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+          resolve({totalData :data.length ,data});
+
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+  
 };
 
 /**
