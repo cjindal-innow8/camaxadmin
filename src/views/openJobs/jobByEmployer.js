@@ -8,6 +8,8 @@ import {
   CDataTable,
   CRow,CButton
 } from '@coreui/react'
+import Pagination from "react-js-pagination";
+import Loader from '../../utilities/loader/index.js'
 import ReadMoreReact from '../../utilities/readMore'
 import {acceptJobTemplate} from '../../utilities/emailTemplates/jobRequestAccepted'
 import {rejectJobTemplate} from '../../utilities/emailTemplates/jobRequestRejected'
@@ -15,7 +17,7 @@ import Alert from "../../utilities/Alerts"
 import RejectJobModal from './rejectJobModal'
 import AcceptJobModal from './acceptJobModal'
 import {sendMail} from '../../utilities/sendEmail'
-import {getAllPostByEmployer,deleteEmployerPost,updateStatusOfEmployerPost} from "../../firebase/firebasedb";
+import {getAllPostByEmployer,deleteEmployerPost,updateStatusOfEmployerPost,getTotalOfEmployerPost} from "../../firebase/firebasedb";
 
 
 function JobByEmployer(props) {
@@ -25,13 +27,28 @@ function JobByEmployer(props) {
   const [indexToUpdate , setIndexToUpdate] = useState(-1)
   const [statusToUpdate, setStatusToUpdate] = useState('')
   const [rejectionReason, setRejectionReason] = useState()
+  const [page, setPage] = useState(1)
+  const [totaldata, setTotalData] = useState()
+  const [isLoading, setLoading ] = useState(false)
+  let limit = 2
   useEffect(() => {
-    getEmployerPost()
+    getEmployerPost(page)
+    getEmployerPostCount()
   }, [])
 
-  const getEmployerPost = async () => {
-    const result = await getAllPostByEmployer()
+  const getEmployerPostCount = async ()=>{
+    const result = await getTotalOfEmployerPost()
+    setTotalData(result.totalData)
+    
+  }
+
+  const getEmployerPost = async (pageNumber) => {
+    const offset = (pageNumber - 1) *  limit 
+    setLoading(true)
+    const result = await getAllPostByEmployer(offset,limit)
     setEmployerPost(result)
+    setLoading(false)
+
   }
 
   const  deletePost = (index)=>{
@@ -95,6 +112,12 @@ function JobByEmployer(props) {
     setOpenReject(!openReject)
   }
 
+  const pageChange = (pagenumber)=>{
+    setPage(pagenumber)
+    getEmployerPost(pagenumber)
+
+  }
+
   const updateStatus = (id,status)=>{
     updateStatusOfEmployerPost(id,status,(res)=>{
       if(res){
@@ -105,7 +128,7 @@ function JobByEmployer(props) {
    
   return (
     <div>
-      
+       { isLoading && <Loader/>}
      {(employerPost && employerPost.length > 0) ?
      <>
        <table className="table table-striped table-hover">
@@ -160,6 +183,17 @@ function JobByEmployer(props) {
           <RejectJobModal isOpen = {openReject} rejectionReason = {rejectionReason} setRejectionReason = {setRejectionReason} 
           toggleRejectModal = {toggleRejectModal}
           changeStatus = {changeStatus}/>
+     <Pagination
+     className="mt-3 mx-auto w-fit-content"
+     itemClass="page-item"
+     linkClass="page-link"
+     activeClass="active"
+     activePage={page}
+     itemsCountPerPage={limit}
+     totalItemsCount={totaldata}
+    //  pageRangeDisplayed={5}
+     onChange={pageChange}
+   />
       </>
       : <div> 
       No Data

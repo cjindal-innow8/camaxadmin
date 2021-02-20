@@ -8,6 +8,7 @@ import {
   CDataTable,
   CRow,CButton
 } from '@coreui/react'
+import Loader from '../../utilities/loader/index.js'
 import ReadMoreReact from '../../utilities/readMore'
 import {acceptJobTemplate} from '../../utilities/emailTemplates/jobRequestAccepted'
 import {rejectJobTemplate} from '../../utilities/emailTemplates/jobRequestRejected'
@@ -15,10 +16,9 @@ import AcceptJobModal from './acceptJobModal'
 import Alert from "../../utilities/Alerts"
 import {sendMail} from '../../utilities/sendEmail'
 import RejectJobModal from './rejectJobModal'
-import {getAllPostByEmployee,deleteEmployeePost,updateStatusOfEmployeePost} from "../../firebase/firebasedb"
-// var acceptionEmailTemplate = require('../../utilities/emailTemplates/jobRequestAccepted.js');
-// var rejectionTemplate = require('../../utilities/emailTemplates/jobRequestRejected.js');
-
+import Pagination from "react-js-pagination";
+import {getAllPostByEmployee,deleteEmployeePost,updateStatusOfEmployeePost,getTotalOfEmployeePost} from "../../firebase/firebasedb"
+// let limit = 3
 function JobsByEmployee(props) {
   const [employeePost, setEmployeePost] = useState([])
   const [openAccept , setOpenAccept] = useState(false)
@@ -26,13 +26,26 @@ function JobsByEmployee(props) {
   const [indexToUpdate , setIndexToUpdate] = useState(-1)
   const [statusToUpdate, setStatusToUpdate] = useState('')
   const [rejectionReason, setRejectionReason] = useState()
+  const [isLoading, setLoading ] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totaldata, setTotalData] = useState()
+  let limit = 3
   useEffect(() => {
-    getEmployeePost()
+    getEmployeePost(page)
+    getEmployeePostCount()
     
   }, [])
-  const getEmployeePost = async () => {
-    const result = await getAllPostByEmployee()
+  const getEmployeePostCount = async ()=>{
+    const result = await getTotalOfEmployeePost()
+    setTotalData(result.totalData)
+  }
+  const getEmployeePost = async (pageNumber) => {
+    setLoading(true)
+    const offset = (pageNumber - 1) *  limit 
+    const result = await getAllPostByEmployee(offset,limit)
+
     setEmployeePost(result)
+    setLoading(false)
   }
 
   const toggleAcceptModal = ()=>{
@@ -47,9 +60,12 @@ function JobsByEmployee(props) {
     let employee = newArray.splice(index,1)
     const id = employee[0].id
     setEmployeePost(newArray)
+    // setLoading(true)
     deleteEmployeePost(id, (res)=>{
       if(res){
         Alert(200, "Post delete Successfully !!")
+      //  setLoading(true)
+
       }
     })
    }
@@ -95,6 +111,12 @@ function JobsByEmployee(props) {
     });
   }
 
+  const pageChange = (pagenumber)=>{
+    setPage(pagenumber)
+    getEmployeePost(pagenumber)
+
+  }
+
   const updateStatus = (id,status)=>{
     updateStatusOfEmployeePost(id,status,(res)=>{
       if(res){
@@ -105,8 +127,10 @@ function JobsByEmployee(props) {
 
   return (
     <div>
+      { isLoading && <Loader/>}
       { (employeePost && employeePost.length >  0) ?
       <>
+     
           <table className="table table-striped table-hover">
             <tr>
           <th> Name </th>
@@ -157,6 +181,19 @@ function JobsByEmployee(props) {
           <RejectJobModal isOpen = {openReject} rejectionReason = {rejectionReason} setRejectionReason = {setRejectionReason} 
           toggleRejectModal = {toggleRejectModal}
           changeStatus = {changeStatus}/>
+
+<Pagination
+     className="mt-3 mx-auto w-fit-content"
+     itemClass="page-item"
+     linkClass="page-link"
+     activeClass="active"
+     activePage={page}
+     itemsCountPerPage={limit}
+     totalItemsCount={totaldata}
+    //  pageRangeDisplayed={5}
+     onChange={pageChange}
+   />
+
           </>
             : <div> 
                 No Data

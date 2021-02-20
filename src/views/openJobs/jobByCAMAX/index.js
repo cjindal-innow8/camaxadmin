@@ -16,12 +16,15 @@ function JobByCAMAX(props) {
   const [idToUpdate, setIdToUpdate] = useState()
   const [isUpdate, setIsUpdate] = useState(false)
   const {toggleJob,getJob} = props
+  const [isLoading, setLoading ] = useState(false)
   useEffect(() => {
     getCAMAXPost ()
   }, [])
   const getCAMAXPost = async()=>{
+    setLoading(true)
     const result =  await getAllPostByCAMAX()
     setJobs(result)
+    setLoading(false)
    }
    const updateJob = async()=>{
     //  console.log("updateJobupdateJob=",updateJob)
@@ -106,7 +109,9 @@ const handleChange = (event) => {
     
    <JobContainer jobs = {jobs}  deleteJob = {deleteJob} 
    toggle = {toggle}
-   editJob = {editJob} isOpen= {isOpen} handleChange = {handleChange} values = {fields} isUpdate = {isUpdate} updateJob = {updateJob} toggleJob= {toggleJob} getJob={getJob} onAdd = {handleAdd}/>
+   editJob = {editJob} isOpen= {isOpen} handleChange = {handleChange} values = {fields} isUpdate = {isUpdate} updateJob = {updateJob} toggleJob= {toggleJob} getJob={getJob} onAdd = {handleAdd}
+   isLoading = {isLoading}
+   />
    </>
   );
   

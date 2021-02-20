@@ -3,11 +3,12 @@ import {
  CButton
 } from '@coreui/react'
 import AddJob from './addJob'
+import Loader from '../../../utilities/loader/index.js'
 function JobContainer(props) {
-  const {jobs,deleteJob, toggleJob,isOpen,editJob,handleChange,values,toggle,isUpdate,updateJob, getJob,onAdd} = props 
+  const {jobs,deleteJob, toggleJob,isOpen,editJob,handleChange,values,toggle,isUpdate,updateJob, getJob,onAdd,isLoading} = props 
   return (
     <div>
-       
+      { isLoading &&  <Loader/>}
         {
           (jobs && jobs.length > 0) ?
           <table className="table table-striped table-hover">

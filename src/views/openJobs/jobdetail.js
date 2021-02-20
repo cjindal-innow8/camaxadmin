@@ -2,27 +2,45 @@ import React, { useEffect, useState } from 'react';
 import {
   CButton
 } from '@coreui/react'
+import Pagination from "react-js-pagination";
 import { getApplicantsForJob } from '../../firebase/firebasedb'
+import Loader from '../../utilities/loader/index.js'
 
 function Jobdetail(props) {
   const { toggleJob, job } = props
   const [data, setData] = useState([])
+  const [isLoading, setLoading ] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totaldata, setTotalData] = useState()
+  let limit = 1
   useEffect(() => {
-    console.log("jobjobjobjob=", job)
     if (props.job) {
-      getJobById(job)
+      getJobById(page)
     }
   }, [props])
 
-  const getJobById = async () => {
-    const result = await getApplicantsForJob(job.id)
-    setData(result)
+  const getJobById = async (pageNumber) => {
+    const offset = (pageNumber - 1) *  limit 
+    setLoading(true)
+    const result = await getApplicantsForJob(job.id,offset,limit)
+    setData(result.data)
+    setTotalData(result.totalData)
+    setLoading(false)
+
+  }
+  const pageChange = (pagenumber)=>{
+    setPage(pagenumber)
+    getJobById(pagenumber)
+
   }
 
   return (
     <div>
+     { isLoading && <Loader/>}
       <CButton color = "primary" onClick={toggleJob} > Back </CButton>
-      {(data && data.length > 0 ) ? <table className="table table-striped table-hover">
+      {(data && data.length > 0 ) ? 
+      <>
+      <table className="table table-striped table-hover">
         <tr >
           <th> Name </th>
           <th> Email </th>
@@ -49,6 +67,18 @@ function Jobdetail(props) {
           })
         }
       </table>
+      <Pagination
+     className="mt-3 mx-auto w-fit-content"
+     itemClass="page-item"
+     linkClass="page-link"
+     activeClass="active"
+     activePage={page}
+     itemsCountPerPage={limit}
+     totalItemsCount={totaldata}
+    //  pageRangeDisplayed={5}
+     onChange={pageChange}
+     />
+    </>
       : 
       <div> 
       No Data

@@ -14,38 +14,30 @@ import {
   CInput
 } from '@coreui/react'
 import {getAllUsers,getTotalUser} from '../../firebase/firebasedb'
-// import usersData from './UsersData'
-// {id: 0, name: 'John Doe', registered: '2018/01/01', role: 'Guest', status: 'Pending'}
-const getBadge = status => {
-  switch (status) {
-    case 'Active': return 'success'
-    case 'Inactive': return 'secondary'
-    case 'Pending': return 'warning'
-    case 'Banned': return 'danger'
-    default: return 'primary'
-  }
-}
 let intialData ;
 let limit = 3
 const Users = (props) => {
   const history = useHistory()
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
-  // const currentPage = Number(queryPage && queryPage[1] ? queryPage[1] : 1)
   const [page, setPage] = useState(1)
   const [totaldata, setTotalData] = useState()
   const [usersData,setuserData] = useState([])
   const [headings , setHeadings] = useState([])
- 
+ const [isLoading, setIsLoading] = useState(false)
   const getUserData = async(pageNumber)=>{
+    setIsLoading(true)
     const offset = (pageNumber - 1) *  limit 
     const result = await getAllUsers(offset,limit)
-    console.log("getAllUsersgetAllUsers=",result)
     intialData = result
     setuserData(result.data)
-    setTotalData(result.totalData)
+    setIsLoading(false)
+    // setTotalData(result.totalData)
   }
-  const getUserCount = ()=>{
-    getTotalUser()
+  const getUserCount = async ()=>{
+    setIsLoading(true)
+    const result = await getTotalUser()
+    setTotalData(result.totalData)
+    setIsLoading(false)
   }
   useEffect(()=>{
     getUserCount()
@@ -95,7 +87,7 @@ const Users = (props) => {
        
      <CInput className="search-input" onChange = {handleSearch} placeholder = "Search" />
      </div>
-     {/* <Loader/> */}
+    {isLoading && <Loader/>}
    { (usersData && usersData.length > 0) ?  
    <>
    <table className="table table-striped table-hover">

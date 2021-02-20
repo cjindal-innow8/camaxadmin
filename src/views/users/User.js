@@ -8,6 +8,7 @@ import AddLicenceModal from './addLicenceModal'
 import Alert from "../../utilities/Alerts"
 import { useHistory, useLocation } from 'react-router-dom'
 import UserLicences from './userLicences'
+import Loader from '../../utilities/loader/index.js'
 const formDetail = {
   licenceKey: "",
   productName: "",
@@ -21,26 +22,32 @@ const User = (props) => {
   const [licences, setLicences] = useState()
   const [fields, setFields] = useState(formDetail);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [availableProduct, setAvailableProduct] = useState();
-
+ 
   useEffect(() => {
     getUserDeatail()
     getAllProducts()
   }, [])
 
   const getUserDeatail = async () => {
+    setIsLoading(true)
     const userId = props.match.params.id
     const result = await getUser("uid", userId)
     setUserData(result)
     const licenceObj = result && result[0] && result[0].licence
     const licenceData = licenceObj && Object.values(licenceObj)
     setLicences(licenceData)
+    setIsLoading(false)
+
   }
 
   const getAllProducts = async () => {
+    setIsLoading(true)
     const result = await getProducts()
     setAvailableProduct(result)
+    setIsLoading(false)
   }
 
   const OnAdd = () => {
@@ -177,6 +184,7 @@ const User = (props) => {
 
   return (
     <>
+   {isLoading && <Loader/>}
       <CRow>
         <CCol lg={8}>
 
@@ -195,7 +203,7 @@ const User = (props) => {
               <div className="user-details-wrapper">
                 <p> <CLabel> FullName : </CLabel> <span> {userData && userData[0] && userData[0].username}</span> </p>
                 <p> <CLabel> Email : </CLabel> <span>{userData && userData[0] && userData[0].email}</span> </p>
-                <p> <CLabel> Phone : </CLabel>  <span>{userData && userData[0] && userData[0].phone || "9876543210"}</span>  </p>
+                <p> <CLabel> Phone : </CLabel>  <span>{userData && userData[0] && userData[0].phone || "--"}</span>  </p>
                 <p> <CLabel> Address : </CLabel><span> {userData && userData[0] && userData[0].address}</span>  </p>
                 <p> <CLabel> City : </CLabel> <span> {userData && userData[0] && userData[0].city}</span>  </p>
                 <p> <CLabel> State: </CLabel>  <span> {userData && userData[0] && userData[0].state} </span></p>
