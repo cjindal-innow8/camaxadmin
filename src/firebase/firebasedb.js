@@ -316,9 +316,20 @@ export const getAllUsers = (offset, limit) => {
     return new Promise((resolve, reject) => {
       try {
         database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().limitToFirst(limit).once("value", (snapshot) => {
-          const values = snapshot.val() || {}
-          const data = Object.values(values)||[]
-          const keys = Object.keys(values) || []
+          // const values = snapshot.val() || {}
+          // const data = Object.values(values)||[]
+          // const keys = Object.keys(values) || []
+          let data = []
+        const values = snapshot.val()
+        const keys = values && Object.keys(values) || []
+        keys && keys.forEach(key => {
+          let res = values[key]
+          res = {
+            ...res,
+            id: key
+          }
+          data.push(res)
+        })
           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
           resolve(data);
         });
@@ -330,9 +341,21 @@ export const getAllUsers = (offset, limit) => {
     return new Promise((resolve, reject) => {
       try {
         database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value", (snapshot) => {
-          const values = snapshot.val() || {}
-          const data = Object.values(values)||[]
-          const keys = Object.keys(values) || []
+          let data = []
+        const values = snapshot.val()
+        const keys = values && Object.keys(values) || []
+        keys && keys.forEach(key => {
+          let res = values[key]
+          res = {
+            ...res,
+            id: key
+          }
+          data.push(res)
+        })
+        // resolve(data)
+          // const values = snapshot.val() || {}
+          // const data = Object.values(values)||[]
+          // const keys = Object.keys(values) || []
           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
           resolve(data);
 
@@ -371,6 +394,7 @@ export const getAllUsers = (offset, limit) => {
  *
  */
 export const  updateStatusOfEmployerPost = async (id,status,callback)=>{
+  console.log("idididid=",id)
   await database.ref(SCHEMA.POSTBYEMPLOYER + "/" + id).update({status:status})
    callback(true)
   }
@@ -506,9 +530,20 @@ export const getAllPostByEmployee = (offset, limit) => {
     return new Promise((resolve, reject) => {
       try {
         database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().limitToFirst(limit).once("value", (snapshot) => {
-          const values = snapshot.val() || {}
-          const data = Object.values(values)||[]
-          const keys = Object.keys(values) || []
+          let data = []
+          const values = snapshot.val()
+          const keys = values && Object.keys(values) || []
+          keys && keys.forEach(key => {
+            let res = values[key]
+            res = {
+              ...res,
+              id: key
+            }
+            data.push(res)
+          })
+          // const values = snapshot.val() || {}
+          // const data = Object.values(values)||[]
+          // const keys = Object.keys(values) || []
           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
           resolve(data);
         });
@@ -520,9 +555,20 @@ export const getAllPostByEmployee = (offset, limit) => {
     return new Promise((resolve, reject) => {
       try {
         database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value", (snapshot) => {
-          const values = snapshot.val() || {}
-          const data = Object.values(values)||[]
-          const keys = Object.keys(values) || []
+          // const values = snapshot.val() || {}
+          // const data = Object.values(values)||[]
+          // const keys = Object.keys(values) || []
+          let data = []
+          const values = snapshot.val()
+          const keys = values && Object.keys(values) || []
+          keys && keys.forEach(key => {
+            let res = values[key]
+            res = {
+              ...res,
+              id: key
+            }
+            data.push(res)
+          })
           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
           resolve(data);
 
