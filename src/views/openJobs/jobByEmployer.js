@@ -10,7 +10,8 @@ import {
 } from '@coreui/react'
 import Pagination from "react-js-pagination";
 import Loader from '../../utilities/loader/index.js'
-import ReadMoreReact from '../../utilities/readMore'
+// import ReadMoreReact from '../../utilities/readMore'
+import ReadMoreAndLess from 'react-read-more-less'
 import {acceptJobTemplate} from '../../utilities/emailTemplates/jobRequestAccepted'
 import {rejectJobTemplate} from '../../utilities/emailTemplates/jobRequestRejected'
 import Alert from "../../utilities/Alerts"
@@ -153,8 +154,15 @@ function JobByEmployer(props) {
               <td> {jobTitle} </td>
               <td> {ctc} </td>
               <td> {experience} </td>
-              <td> < ReadMoreReact text = {description}/>  </td>
-
+              {/* <td> < ReadMoreReact text = {description}/>  </td> */}
+              <td>   
+                <ReadMoreAndLess
+                charLimit={10}
+                readMoreText="&nbsp; more"
+                readLessText="&nbsp; less"
+              >
+                {description}
+              </ReadMoreAndLess> </td>
               {/* <td> {description} </td> */}
               <td> {
                 (status === "pending") ? <>

@@ -9,7 +9,10 @@ import {
   CRow,CButton
 } from '@coreui/react'
 import Loader from '../../utilities/loader/index.js'
-import ReadMoreReact from '../../utilities/readMore'
+// import ReadMoreReact from '../../utilities/readMore'
+// import ReadMoreReact from 'read-more-react'
+import ReadMoreAndLess from 'react-read-more-less'
+
 import {acceptJobTemplate} from '../../utilities/emailTemplates/jobRequestAccepted'
 import {rejectJobTemplate} from '../../utilities/emailTemplates/jobRequestRejected'
 import AcceptJobModal from './acceptJobModal'
@@ -146,6 +149,7 @@ function JobsByEmployee(props) {
           employeePost && employeePost.map((employee, index) => {
             const { about, ctc, email, experience, jobTitle, name, phone, status } = employee
             {console.log("statusstatusstatus=",status)}
+            const aboutData = employee.about
             return (<tr key = {index}>
               <td> {name} </td>
               <td> {email} </td>
@@ -153,8 +157,19 @@ function JobsByEmployee(props) {
               <td> {jobTitle} </td>
               <td> {ctc} </td>
               <td> {experience} </td>
-              <td> < ReadMoreReact text = {about}/>  </td>
-              <td> {
+             
+              <td>   
+                <ReadMoreAndLess
+                charLimit={10}
+                readMoreText="&nbsp; more"
+                readLessText="&nbsp; less"
+              >
+                {aboutData}
+              </ReadMoreAndLess> </td>
+              {/* <td>  */}
+              {/* <td> {aboutData}  </td> */}
+              <td> 
+                {
                 
                 (status === "pending") ? <>
                   <CBadge color = "success" onClick={() => { 
