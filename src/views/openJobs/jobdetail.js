@@ -33,7 +33,6 @@ function Jobdetail(props) {
     getJobById(pagenumber)
 
   }
-
   return (
     <div>
      { isLoading && <Loader/>}
@@ -59,10 +58,8 @@ function Jobdetail(props) {
               <td> {position} </td>
               <td> {phone} </td>
               <td> {about} </td>
-              {console.log("filefilefilefile mohit",file)}
               <td> <a href={file} target = "blank" download={"logo.png"} onLoad={(res) => {
-                console.log('load res : ', res)
-              }}> download CV </a> </td>
+              }}> View CV </a> </td>
             </tr>)
           })
         }

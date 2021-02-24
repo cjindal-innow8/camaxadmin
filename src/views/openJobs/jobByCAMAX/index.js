@@ -65,7 +65,11 @@ const handleAdd = ()=>{
     Alert(400, "All fields are required !!");
     return;
   }
-  const data = fields
+  let data = fields
+  data={
+    ...data,
+    location:'Panchkula, India'
+  }
    addCAMAXPost(data,(res)=>{
     if(res){
     Alert(200, "Job Added Successfully!!");
