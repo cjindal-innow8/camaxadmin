@@ -148,7 +148,6 @@ function JobsByEmployee(props) {
         {
           employeePost && employeePost.map((employee, index) => {
             const { about, ctc, email, experience, jobTitle, name, phone, status } = employee
-            {console.log("statusstatusstatus=",status)}
             const aboutData = employee.about
             return (<tr key = {index}>
               <td> {name} </td>

@@ -6,6 +6,7 @@ const TheHeaderDropdown = (props) => {
 
   const handleLogout = (e) => {
     e.preventDefault();
+    localStorage.setItem("isLogin",false)
     history.push("/login");
   };
   return (

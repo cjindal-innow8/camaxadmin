@@ -46,6 +46,7 @@ const Login = (props) => {
   const isVlidAdmin = await loginAdmin(data)
   console.log("isVlidAdminisVlidAdminisVlidAdmin=",isVlidAdmin)
   if(isVlidAdmin){
+    localStorage.setItem("isLogin",true)
     props.history.push("/users")
   }else {
     return Alert(400, "Please enter correct username or password ");

@@ -5,6 +5,8 @@ import {
 import Pagination from "react-js-pagination";
 import { getApplicantsForJob } from '../../firebase/firebasedb'
 import Loader from '../../utilities/loader/index.js'
+import ReadMoreAndLess from 'react-read-more-less'
+
 
 function Jobdetail(props) {
   const { toggleJob, job } = props
@@ -51,13 +53,19 @@ function Jobdetail(props) {
         {
           data && data.map((employee, index) => {
             const { about, email, position, firstName,file, lastName, phone, } = employee
-            console.log("file filefile=", file)
             return (<tr key={index}>
               <td> {firstName} </td>
               <td> {email} </td>
               <td> {position} </td>
               <td> {phone} </td>
-              <td> {about} </td>
+              <td>   
+                <ReadMoreAndLess
+                charLimit={10}
+                readMoreText="&nbsp; more"
+                readLessText="&nbsp; less"
+              >
+                {about}
+              </ReadMoreAndLess> </td>
               <td> <a href={file} target = "blank" download={"logo.png"} onLoad={(res) => {
               }}> View CV </a> </td>
             </tr>)

@@ -80,7 +80,6 @@ const Users = (props) => {
    }
   }
 
-  console.log("usersDatausersData=",usersData)
   return (
    <div>
      <div>

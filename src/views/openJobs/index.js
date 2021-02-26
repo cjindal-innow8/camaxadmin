@@ -129,7 +129,6 @@ const Tabs = () => {
     setShowJobs(!isShowJobs)
   }
   const getJob = (data)=>{
-    console.log("getJobgetJob=",data)
     setJob(data)
   }
   const handleAdd = ()=>{
