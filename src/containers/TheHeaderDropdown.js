@@ -1,18 +1,23 @@
-import React from 'react'
-import {
-  CBadge,
-  CDropdown,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
-  CImg
-} from '@coreui/react'
-import CIcon from '@coreui/icons-react'
+import React from "react";
+import { Button } from "reactstrap";
+import { useHistory, useLocation } from 'react-router-dom'
+const TheHeaderDropdown = (props) => {
+  const history = useHistory()
 
-const TheHeaderDropdown = () => {
+  const handleLogout = (e) => {
+    e.preventDefault();
+    history.push("/login");
+  };
   return (
-    <div></div>
-  )
-}
-
-export default TheHeaderDropdown
+    <div>
+      <Button
+        color="primary"
+        onClick={handleLogout}
+        className="logout-btn ml-2"
+      >
+        Logout
+      </Button>
+    </div>
+  );
+};
+export default TheHeaderDropdown;

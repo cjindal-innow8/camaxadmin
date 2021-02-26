@@ -10,6 +10,7 @@ export const SCHEMA = {
   POSTBYCAMAX : 'postbycamax',
   PRODUCTS : 'products',
   COUPONS : 'coupons',
+  ADMIN : 'admin',
 
 };
 
@@ -104,6 +105,36 @@ let lastVisible = ''
     // })
    
  };
+
+ export const addAdminTable = async ()=>{
+   let data = {
+     userName : "admin",
+     password : "admin",
+   }
+  await database.ref(SCHEMA.ADMIN + "/").push(data)
+  
+ }
+
+ export const loginAdmin = async (data)=>{
+   let valid = false
+  const result = await database.ref(SCHEMA.ADMIN).orderByChild("userName").equalTo(data.username).limitToFirst(1).once("value")
+  if(result){
+    const value = result.val() || {}
+    console.log("valuevaluevalue=",value)
+    const resData = Object.values(value) || []
+    console.log("resDataresData=",resData)
+    resData.forEach(el=>{
+      if(el.userName === data.username && el.password === data.password){
+        valid = true
+      }else{
+        valid=false
+      }
+    })
+  }
+  return valid
+ }
+
+
 
  export const getTotalUser = ()=>{
   return new Promise((resolve, reject) => {

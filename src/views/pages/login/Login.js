@@ -1,5 +1,6 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { Link } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -15,8 +16,48 @@ import {
   CRow
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
+import Alert from '../../../utilities/Alerts'
+import {addAdminTable,loginAdmin} from '../../../firebase/firebasedb'
 
-const Login = () => {
+const Login = (props) => {
+  const history = useHistory()
+  const[username, setUserName] = useState('')
+  const[password, setPassword] = useState('')
+
+  const handleChange = (e)=>{
+ const key = e.target.id
+ const value = e.target.value
+ if(key === "username"){
+  setUserName(value)
+ } else if(key === "password"){
+  setPassword(value)
+ }
+  }
+
+  const handleLogin = async()=>{
+  if(!username|| !password){
+    Alert(400, "All fields are required !!");
+    return;
+  }
+  let data = {
+    username,
+    password,
+  }
+  const isVlidAdmin = await loginAdmin(data)
+  console.log("isVlidAdminisVlidAdminisVlidAdmin=",isVlidAdmin)
+  if(isVlidAdmin){
+    props.history.push("/users")
+  }else {
+    return Alert(400, "Please enter correct username or password ");
+  }
+    
+    
+  }
+
+  // const handleLoginData = ()=>{
+  //   addAdminTable()
+  // }
+
   return (
     <div className="c-app c-default-layout flex-row align-items-center">
       <CContainer>
@@ -34,7 +75,7 @@ const Login = () => {
                           <CIcon name="cil-user" />
                         </CInputGroupText>
                       </CInputGroupPrepend>
-                      <CInput type="text" placeholder="Username" autoComplete="username" />
+                      <CInput type="text" placeholder="Username" id = "username" autoComplete="username" onChange = {handleChange}/>
                     </CInputGroup>
                     <CInputGroup className="mb-4">
                       <CInputGroupPrepend>
@@ -42,29 +83,17 @@ const Login = () => {
                           <CIcon name="cil-lock-locked" />
                         </CInputGroupText>
                       </CInputGroupPrepend>
-                      <CInput type="password" placeholder="Password" autoComplete="current-password" />
+                      <CInput type="password" placeholder="Password" id = "password" autoComplete="current-password"  onChange= {handleChange} />
                     </CInputGroup>
                     <CRow>
                       <CCol xs="6">
-                        <CButton color="primary" className="px-4">Login</CButton>
+                        <CButton color="primary" className="px-4" onClick = {handleLogin}>Login</CButton>
                       </CCol>
-                      <CCol xs="6" className="text-right">
-                        <CButton color="link" className="px-0">Forgot password?</CButton>
-                      </CCol>
+                      {/* <CCol xs="6">
+                        <CButton color="primary" className="px-4" onClick = {handleLoginData}>LoginData</CButton>
+                      </CCol> */}
                     </CRow>
                   </CForm>
-                </CCardBody>
-              </CCard>
-              <CCard className="text-white bg-primary py-5 d-md-down-none" style={{ width: '44%' }}>
-                <CCardBody className="text-center">
-                  <div>
-                    <h2>Sign up</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut
-                      labore et dolore magna aliqua.</p>
-                    <Link to="/register">
-                      <CButton color="primary" className="mt-3" active tabIndex={-1}>Register Now!</CButton>
-                    </Link>
-                  </div>
                 </CCardBody>
               </CCard>
             </CCardGroup>

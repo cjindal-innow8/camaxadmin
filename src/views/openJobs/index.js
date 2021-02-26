@@ -163,7 +163,7 @@ const Tabs = () => {
 
         {/* <CCard>
           <CCardHeader> */}
-            Open Jobs
+            {/* Open Jobs */}
             {/* <DocsLink name="CTabs"/> */}
           {/* </CCardHeader> */}
           {/* <CCardBody> */}
