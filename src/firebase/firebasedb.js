@@ -15,6 +15,7 @@ export const SCHEMA = {
 };
 
 let lastVisible = ''
+let lastFetch 
 
 
  /**
@@ -339,17 +340,14 @@ export const getAllUsers = (offset, limit) => {
   * 
   *
   */
- export const  getAllPostByEmployer = (offset,limit) => {
-
-
-  lastVisible = (offset==0 )? '':lastVisible
+ export const  getAllPostByEmployer = async (offset,limit,lastpage, newPage) => {
+   const fetchDiffrence = newPage - lastpage 
+   lastVisible = (offset===0 )? '':lastVisible
+   
   if(!lastVisible){
     return new Promise((resolve, reject) => {
       try {
         database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().limitToFirst(limit).once("value", (snapshot) => {
-          // const values = snapshot.val() || {}
-          // const data = Object.values(values)||[]
-          // const keys = Object.keys(values) || []
           let data = []
         const values = snapshot.val()
         const keys = values && Object.keys(values) || []
@@ -369,6 +367,75 @@ export const getAllUsers = (offset, limit) => {
       }
     });
   }else {
+   if(fetchDiffrence > 1){
+    return new Promise(async (resolve, reject) => {
+    const result = await database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().startAfter(lastVisible).limitToFirst((fetchDiffrence - 1) * limit).once("value")
+    if(result){
+      const values = result.val()
+      const keys = values && Object.keys(values) || []
+      lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+
+      const reponse = await  database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value")
+      if(reponse){
+        let data = []
+        const values = reponse.val()
+        const keys = values && Object.keys(values) || []
+        keys && keys.forEach(key => {
+          let res = values[key]
+          res = {
+            ...res,
+            id: key
+          }
+          data.push(res)
+          lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+          resolve(data);
+        })
+      }else {
+        resolve([])
+      }
+    }else {
+      resolve([])
+    }
+
+    })
+
+
+   }
+
+   else if(fetchDiffrence < 0){
+    return new Promise(async (resolve, reject) => {
+      const result = await database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().limitToFirst((newPage - 1)* limit).once("value")
+      if(result){
+        const values = result.val()
+        const keys = values && Object.keys(values) || []
+        lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+        const reponse = await  database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value")
+        if(reponse){
+          let data = []
+          const values = reponse.val()
+          const keys = values && Object.keys(values) || []
+          keys && keys.forEach(key => {
+            let res = values[key]
+            res = {
+              ...res,
+              id: key
+            }
+            data.push(res)
+            lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+            resolve(data);
+          })
+        }else {
+          resolve([])
+        }
+      }else {
+        resolve([])
+      }
+  
+      })
+    
+   }
+   
+   else {
     return new Promise((resolve, reject) => {
       try {
         database.ref(SCHEMA.POSTBYEMPLOYER).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value", (snapshot) => {
@@ -383,10 +450,6 @@ export const getAllUsers = (offset, limit) => {
           }
           data.push(res)
         })
-        // resolve(data)
-          // const values = snapshot.val() || {}
-          // const data = Object.values(values)||[]
-          // const keys = Object.keys(values) || []
           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
           resolve(data);
 
@@ -395,6 +458,8 @@ export const getAllUsers = (offset, limit) => {
         reject(error);
       }
     });
+   }
+   
   }
 
 
@@ -555,80 +620,179 @@ export const addNewLicenecForUesr = async (userId, data, callback)=>{
  * 
  *
  */
-export const getAllPostByEmployee = (offset, limit) => {
-  lastVisible = (offset==0 )? '':lastVisible
-  if(!lastVisible){
-    return new Promise((resolve, reject) => {
-      try {
-        database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().limitToFirst(limit).once("value", (snapshot) => {
-          let data = []
-          const values = snapshot.val()
-          const keys = values && Object.keys(values) || []
-          keys && keys.forEach(key => {
-            let res = values[key]
-            res = {
-              ...res,
-              id: key
-            }
-            data.push(res)
-          })
-          // const values = snapshot.val() || {}
-          // const data = Object.values(values)||[]
-          // const keys = Object.keys(values) || []
-          lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
-          resolve(data);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }else {
-    return new Promise((resolve, reject) => {
-      try {
-        database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value", (snapshot) => {
-          // const values = snapshot.val() || {}
-          // const data = Object.values(values)||[]
-          // const keys = Object.keys(values) || []
-          let data = []
-          const values = snapshot.val()
-          const keys = values && Object.keys(values) || []
-          keys && keys.forEach(key => {
-            let res = values[key]
-            res = {
-              ...res,
-              id: key
-            }
-            data.push(res)
-          })
-          lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
-          resolve(data);
+// export const getAllPostByEmployee = (offset, limit) => {
+//   lastVisible = (offset===0 )? '':lastVisible
+//   if(!lastVisible){
+//     return new Promise((resolve, reject) => {
+//       try {
+//         database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().limitToFirst(limit).once("value", (snapshot) => {
+//           let data = []
+//           const values = snapshot.val()
+//           const keys = values && Object.keys(values) || []
+//           keys && keys.forEach(key => {
+//             let res = values[key]
+//             res = {
+//               ...res,
+//               id: key
+//             }
+//             data.push(res)
+//           })
+//           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+//           resolve(data);
+//         });
+//       } catch (error) {
+//         reject(error);
+//       }
+//     });
+//   }else {
+//     return new Promise((resolve, reject) => {
+//       try {
+//         database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value", (snapshot) => {
+//           let data = []
+//           const values = snapshot.val()
+//           const keys = values && Object.keys(values) || []
+//           keys && keys.forEach(key => {
+//             let res = values[key]
+//             res = {
+//               ...res,
+//               id: key
+//             }
+//             data.push(res)
+//           })
+//           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+//           resolve(data);
 
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  // return new Promise(async (resolve) => {
-  //   const result = await database.ref(SCHEMA.POSTBYEMPLOYEE + "/").once("value")
-  //   if (result) {
-  //     let data = []
-  //     const values = result.val()
-  //     const keys = values && Object.keys(values)
-  //     keys.forEach(key=>{
-  //       let res= values[key]
-  //       res = {
-  //         ...res,
-  //         id : key
-  //       }
-  //       data.push(res)
-  //     })
-  //     resolve(data)
-  //   } else {
-  //     resolve(null)
-  //   }
-  // })
-};
+//         });
+//       } catch (error) {
+//         reject(error);
+//       }
+//     });
+//   }
+// };
 
   
+
+
+ 
+  export const  getAllPostByEmployee = async (offset,limit,lastpage, newPage) => {
+    const fetchDiffrence = newPage - lastpage 
+    lastVisible = (offset===0 )? '':lastVisible
+    
+   if(!lastVisible){
+     return new Promise((resolve, reject) => {
+       try {
+         database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().limitToFirst(limit).once("value", (snapshot) => {
+           let data = []
+         const values = snapshot.val()
+         const keys = values && Object.keys(values) || []
+         keys && keys.forEach(key => {
+           let res = values[key]
+           res = {
+             ...res,
+             id: key
+           }
+           data.push(res)
+         })
+           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+           resolve(data);
+         });
+       } catch (error) {
+         reject(error);
+       }
+     });
+   }else {
+    if(fetchDiffrence > 1){
+     return new Promise(async (resolve, reject) => {
+     const result = await database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().startAfter(lastVisible).limitToFirst((fetchDiffrence - 1) * limit).once("value")
+     if(result){
+       const values = result.val()
+       const keys = values && Object.keys(values) || []
+       lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+ 
+       const reponse = await  database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value")
+       if(reponse){
+         let data = []
+         const values = reponse.val()
+         const keys = values && Object.keys(values) || []
+         keys && keys.forEach(key => {
+           let res = values[key]
+           res = {
+             ...res,
+             id: key
+           }
+           data.push(res)
+           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+           resolve(data);
+         })
+       }else {
+         resolve([])
+       }
+     }else {
+       resolve([])
+     }
+ 
+     })
+ 
+ 
+    }
+ 
+    else if(fetchDiffrence < 0){
+     return new Promise(async (resolve, reject) => {
+       const result = await database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().limitToFirst((newPage - 1)* limit).once("value")
+       if(result){
+         const values = result.val()
+         const keys = values && Object.keys(values) || []
+         lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+         const reponse = await  database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value")
+         if(reponse){
+           let data = []
+           const values = reponse.val()
+           const keys = values && Object.keys(values) || []
+           keys && keys.forEach(key => {
+             let res = values[key]
+             res = {
+               ...res,
+               id: key
+             }
+             data.push(res)
+             lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+             resolve(data);
+           })
+         }else {
+           resolve([])
+         }
+       }else {
+         resolve([])
+       }
+   
+       })
+     
+    }
+    
+    else {
+     return new Promise((resolve, reject) => {
+       try {
+         database.ref(SCHEMA.POSTBYEMPLOYEE).orderByKey().startAfter(lastVisible).limitToFirst(limit).once("value", (snapshot) => {
+           let data = []
+         const values = snapshot.val()
+         const keys = values && Object.keys(values) || []
+         keys && keys.forEach(key => {
+           let res = values[key]
+           res = {
+             ...res,
+             id: key
+           }
+           data.push(res)
+         })
+           lastVisible = ( keys.length > 0 )? keys[keys.length -1]:''
+           resolve(data);
+ 
+         });
+       } catch (error) {
+         reject(error);
+       }
+     });
+    }
+    
+   }
+  }

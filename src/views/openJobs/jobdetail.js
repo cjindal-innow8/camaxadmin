@@ -80,7 +80,7 @@ function Jobdetail(props) {
      activePage={page}
      itemsCountPerPage={limit}
      totalItemsCount={totaldata}
-    //  pageRangeDisplayed={5}
+     pageRangeDisplayed={5}
      onChange={pageChange}
      />
     </>

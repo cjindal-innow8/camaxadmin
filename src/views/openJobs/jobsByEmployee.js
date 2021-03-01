@@ -32,7 +32,7 @@ function JobsByEmployee(props) {
   const [isLoading, setLoading ] = useState(false)
   const [page, setPage] = useState(1)
   const [totaldata, setTotalData] = useState()
-  let limit = 3
+  let limit = 5
   useEffect(() => {
     getEmployeePost(page)
     getEmployeePostCount()
@@ -45,7 +45,8 @@ function JobsByEmployee(props) {
   const getEmployeePost = async (pageNumber) => {
     setLoading(true)
     const offset = (pageNumber - 1) *  limit 
-    const result = await getAllPostByEmployee(offset,limit)
+    let lastPage = page
+    const result = await getAllPostByEmployee(offset,limit,lastPage,pageNumber)
 
     setEmployeePost(result)
     setLoading(false)
@@ -101,7 +102,7 @@ function JobsByEmployee(props) {
     const content = template(values)
     const data = {
       from :"mmahajaninnow8@gmail.com",
-      to: 'mparchainnow8@gmail.com',
+      to: email,
       subject: "Inquiry from CaMax",
       content,
     };
