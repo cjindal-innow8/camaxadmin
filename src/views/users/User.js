@@ -92,7 +92,8 @@ const User = (props) => {
     const userId = userData && userData[0].uid
     const licenceDetail = {
       id: data.licenceKey,
-      expiryDate: (data.expiryDate > 0) ? data.expiryDate :data.expiryDate.getTime(),
+      // expiryDate: (data.expiryDate > 0) ? data.expiryDate :data.expiryDate.getTime(),
+      expiryDate:  data.expiryDate.getTime() ? data.expiryDate.getTime() : data.expiryDate,
       productName : data.productName,
     };
       updateUserLicence(userId,licenceDetail,(res)=>{

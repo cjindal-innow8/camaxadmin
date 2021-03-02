@@ -72,7 +72,7 @@ function Jobdetail(props) {
           })
         }
       </table>
-      <Pagination
+     { (data && data.length > limit) && <Pagination
      className="mt-3 mx-auto w-fit-content"
      itemClass="page-item"
      linkClass="page-link"
@@ -82,7 +82,7 @@ function Jobdetail(props) {
      totalItemsCount={totaldata}
      pageRangeDisplayed={5}
      onChange={pageChange}
-     />
+     />}
     </>
       : 
       <div> 

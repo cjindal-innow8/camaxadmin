@@ -313,14 +313,6 @@ export const  getAllUsers = async (offset,limit,lastpage, newPage) => {
   
  }
 }
-
-
-
-
-
-
-
-
 /**
    * @method addCAMAXPost : To add post by CAMAX
    * @param {object} data : values to be added
@@ -341,6 +333,33 @@ export const  getAllUsers = async (offset,limit,lastpage, newPage) => {
     await database.ref(SCHEMA.COUPONS + "/").push(data)
     callback(true)
   };
+
+
+   /**
+   * @method updateCoupon : To add coupon
+   * @param {object} data : values to be added
+   *
+   */
+   export const updateCoupon = async (data,callback) => {
+    const id = data.id
+    const dataToUpdate = data.data
+    await database.ref(SCHEMA.COUPONS + "/"+ id).update(dataToUpdate)
+    callback(true)
+  
+  };
+
+
+   /**
+   * @method deleteCoupon : To add coupon
+   * @param {object} data : values to be added
+   *
+   */
+   export const deleteCoupon = async (id,callback) => {
+    await database.ref(SCHEMA.COUPONS + "/" + id).remove()
+    callback(true)
+  };
+
+
 
 
   /**

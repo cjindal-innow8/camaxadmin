@@ -3,7 +3,7 @@ import {
   CButton
  } from '@coreui/react'
 function DisplayCoupons(props) {
-  const {coupons,editCoupon,deleteCoupon} = props 
+  const {coupons,editCoupon,deleteCoupon,isEdit} = props 
   return (
     <div>
        <table className="table table-striped table-hover">

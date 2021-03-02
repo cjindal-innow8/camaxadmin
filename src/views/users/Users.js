@@ -102,7 +102,7 @@ const Users = (props) => {
           usersData && usersData.map((user, index) => {
             const { username, email, companyName, phone ,gstInNumber} = user
             return (
-            <tr key = {index} onClick = {()=>{goToUser(user)}}>
+            <tr key = {index} onClick = {()=>{goToUser(user)}} style = {{cursor: "pointer"}}>
               <td> {username} </td>
               <td> {email} </td>
               <td> {phone?phone:'--'} </td>
@@ -113,7 +113,7 @@ const Users = (props) => {
           })
         }
      </table>
-     <Pagination
+    { (usersData && usersData.length > limit) && <Pagination
      className="mt-3 mx-auto w-fit-content"
      itemClass="page-item"
      linkClass="page-link"
@@ -123,7 +123,7 @@ const Users = (props) => {
      totalItemsCount={totaldata}
     //  pageRangeDisplayed={5}
      onChange={pageChange}
-   />
+   />}
    </>
      : <div> 
       No Data

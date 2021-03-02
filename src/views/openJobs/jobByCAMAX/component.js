@@ -22,7 +22,7 @@ function JobContainer(props) {
           jobs && jobs.map((job, index)=>{
             const { experience, jobTitle } = job
             return (
-              <tr key = {index} >
+              <tr key = {index}  style = {{cursor: "pointer"}} >
               <td onClick = {()=>{
                 getJob(job)
                 toggleJob();

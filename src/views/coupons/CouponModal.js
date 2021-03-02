@@ -10,7 +10,7 @@ import {
 } from '@coreui/react'
 import React from 'react';
 
-function AddCouponModal({handleChange,isOpen, values,toggleModal,OnAdd}) {
+function AddCouponModal({handleChange,isOpen, values,toggleModal,OnAdd,isEdit}) {
   return (
     <div>
       <CModal 
@@ -25,7 +25,7 @@ function AddCouponModal({handleChange,isOpen, values,toggleModal,OnAdd}) {
                <CInput id = "amount" type = "number" placeholder = "Coupon Amount" onChange = {handleChange} value = {values.amount}/>
               </CModalBody>
               <CModalFooter>
-                <CButton color="primary" type = "number" onClick = {OnAdd} >Add</CButton>{' '}
+                <CButton color="primary" type = "number" onClick = {OnAdd} >{!isEdit ? "Add":"Update"}</CButton>{' '}
                 <CButton 
                   color="secondary" 
                   onClick={toggleModal}
