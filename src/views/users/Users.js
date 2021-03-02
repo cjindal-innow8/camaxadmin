@@ -15,7 +15,7 @@ import {
 } from '@coreui/react'
 import {getAllUsers,getTotalUser} from '../../firebase/firebasedb'
 let intialData ;
-let limit = 3
+let limit = 10
 const Users = (props) => {
   const history = useHistory()
   const queryPage = useLocation().search.match(/page=([0-9]+)/, '')
@@ -27,9 +27,10 @@ const Users = (props) => {
   const getUserData = async(pageNumber)=>{
     setIsLoading(true)
     const offset = (pageNumber - 1) *  limit 
-    const result = await getAllUsers(offset,limit)
+    let lastPage = page
+    const result = await getAllUsers(offset,limit,lastPage,pageNumber)
     intialData = result
-    setuserData(result.data)
+    setuserData(result)
     setIsLoading(false)
     // setTotalData(result.totalData)
   }

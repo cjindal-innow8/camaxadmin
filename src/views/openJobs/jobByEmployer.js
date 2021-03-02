@@ -31,7 +31,7 @@ function JobByEmployer(props) {
   const [page, setPage] = useState(1)
   const [totaldata, setTotalData] = useState()
   const [isLoading, setLoading ] = useState(false)
-  let limit = 5
+  let limit = 10
   useEffect(() => {
     getEmployerPost(page)
     getEmployerPostCount()

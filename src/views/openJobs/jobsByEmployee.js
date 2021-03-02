@@ -21,7 +21,7 @@ import {sendMail} from '../../utilities/sendEmail'
 import RejectJobModal from './rejectJobModal'
 import Pagination from "react-js-pagination";
 import {getAllPostByEmployee,deleteEmployeePost,updateStatusOfEmployeePost,getTotalOfEmployeePost} from "../../firebase/firebasedb"
-// let limit = 3
+
 function JobsByEmployee(props) {
   const [employeePost, setEmployeePost] = useState([])
   const [openAccept , setOpenAccept] = useState(false)
@@ -32,7 +32,7 @@ function JobsByEmployee(props) {
   const [isLoading, setLoading ] = useState(false)
   const [page, setPage] = useState(1)
   const [totaldata, setTotalData] = useState()
-  let limit = 5
+  let limit = 10
   useEffect(() => {
     getEmployeePost(page)
     getEmployeePostCount()

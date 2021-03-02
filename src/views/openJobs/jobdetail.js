@@ -14,7 +14,7 @@ function Jobdetail(props) {
   const [isLoading, setLoading ] = useState(false)
   const [page, setPage] = useState(1)
   const [totaldata, setTotalData] = useState()
-  let limit = 1
+  let limit = 10
   useEffect(() => {
     if (props.job) {
       getJobById(page)
