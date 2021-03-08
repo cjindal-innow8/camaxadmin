@@ -1,28 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { licenceDetail } from '../../firebase/firebasedb'
+import { licenceDetail,getTotalLicences } from '../../firebase/firebasedb'
 import {CRow, CCol, CButton } from '@coreui/react'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import moment from 'moment'
 import Loader from '../../utilities/loader/index.js'
+import Pagination from "react-js-pagination";
 
+let limit = 2;
 let InitialData
 function Licences(props) {
   const [detail, setDetails] = useState()
   const [toDate, setToDate] = useState(new Date())
   const [fromDate, setFromDate] = useState(new Date())
   const [isLoading, setLoading] =useState(false)
-  
+  const [page, setPage] = useState(1)
+  const [totaldata, setTotalData] = useState()
+
   useEffect(() => {
-    getLicenceDetail()
+    getLicenceDetail(page)
+    getLicenceCount()
   }, [])
-  const getLicenceDetail = async () => {
+
+  const getLicenceDetail = async (pageNumber) => {
     setLoading(true)
-    const result = await licenceDetail()
+    const offset = (pageNumber - 1) *  limit 
+    let lastPage = page
+    const result = await licenceDetail({offset,limit,lastPage,newPage:pageNumber})
     setDetails(result)
     InitialData = result
     setLoading(false)
   }
+
   const setFrom = (date) => {
     const currentDate = new Date()
     if (moment(toDate) < moment(date)) {
@@ -33,6 +42,18 @@ function Licences(props) {
       filterData(date, toDate)
 
     }
+  }
+
+  const getLicenceCount = async ()=>{
+    setLoading(true)
+    const result = await getTotalLicences()
+    setTotalData(result.totalData)
+    setLoading(false)
+  }
+
+ const pageChange = (pagenumber)=>{
+    setPage(pagenumber)
+    getLicenceDetail(pagenumber)
   }
 
   const setTo = (date) => {
@@ -102,6 +123,17 @@ function Licences(props) {
           })
         }
       </table>
+      <Pagination
+     className="mt-3 mx-auto w-fit-content"
+     itemClass="page-item"
+     linkClass="page-link"
+     activeClass="active"
+     activePage={page}
+     itemsCountPerPage={limit}
+     totalItemsCount={totaldata}
+     pageRangeDisplayed={5}
+     onChange={pageChange}/>
+
     </div>
   );
 }

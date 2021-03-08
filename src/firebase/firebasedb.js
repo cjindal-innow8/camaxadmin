@@ -2,6 +2,7 @@
 // import app from "../services/firebase";
 // import "firebase/database";
 import { database } from "../services/firebase";
+import { asyncForEach } from "../utilities/util";
 export const SCHEMA = {
   USERS: "users",
   POSTBYEMPLOYEE: "postbyemployee",
@@ -11,7 +12,7 @@ export const SCHEMA = {
   PRODUCTS: "products",
   COUPONS: "coupons",
   ADMIN: "admin",
-  LICENCES:"licences"
+  LICENCES: "licences",
 };
 
 let lastVisible = "";
@@ -79,28 +80,6 @@ export const getApplicantsForJob = async (jobId, offset, limit) => {
       resolve(null);
     }
   });
-
-  // return new Promise (async (resolve)=>{
-  //  const result =  await database.ref(SCHEMA.APPLICANTS).orderByChild("jobId")
-  //  .equalTo(jobId).once("value")
-  //  if (result) {
-  //    let data = []
-  //    const values = result.val()
-  //    const keys = values && Object.keys(values)
-  //    keys && keys.forEach(key=>{
-  //      let res= values[key]
-  //      res = {
-  //        ...res,
-  //        id : key
-  //      }
-  //      data.push(res)
-  //    })
-  //    resolve(data)
-  //  } else {
-  //    resolve(null)
-  //  }
-
-  // })
 };
 
 export const addAdminTable = async () => {
@@ -149,51 +128,125 @@ export const getTotalUser = () => {
   });
 };
 
-export const getAllUsersEmail = ()=>{
-return new Promise((resolve,reject)=>{
-   try {
+export const getAllUsersEmail = () => {
+  return new Promise((resolve, reject) => {
+    try {
       database.ref(SCHEMA.USERS).once("value", (snapshot) => {
         const values = snapshot.val() || {};
         const data = Object.values(values) || [];
-        const usersEmail = data.map(el=>{
-          return el.email
-        })
+        const usersEmail = data.map((el) => {
+          return el.email;
+        });
         resolve(usersEmail);
       });
     } catch (error) {
       reject(error);
     }
-})
+  });
+};
 
-}
+export const getTotalLicences = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      database.ref(SCHEMA.LICENCES).once("value", (snapshot) => {
+        const values = snapshot.val() || {};
+        const data = Object.values(values) || [];
+        resolve({ totalData: data.length });
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
 
-export const licenceDetail = () => {
+export const licenceDetail = ({ offset, limit, lastPage, newPage }) => {
   return new Promise(async (resolve, reject) => {
-    const result = await database.ref(SCHEMA.USERS).once("value");
+    const result = await getLicences({ offset, limit, lastPage, newPage });
     if (result) {
       const value = result.val();
+      const keys = (value && Object.keys(value)) || [];
+      lastVisible = keys.length > 0 ? keys[keys.length - 1] : "";
       const data = Object.values(value) || [];
-      const userWithlicences = data.filter((item) => {
-        return item.licence;
+      const dataToSent = [];
+      let details;
+      await asyncForEach(data, async (el, index) => {
+        let uid = el.uid,
+          prevUid = (data[index - 1] && data[index - 1].uid) || el.uid;
+
+        if (uid !== prevUid || index === 0) {
+          const userData = await database
+            .ref(SCHEMA.USERS + "/" + uid)
+            .once("value");
+          details = userData.val();
+        }
+        let licenceData = {
+          ...el,
+          username: details.username,
+          email: details.email,
+          companyName: details.companyName,
+        };
+        dataToSent.push(licenceData);
       });
-      let licecesData = []
-       userWithlicences.forEach((data) => {
-        const newData = Object.values(data.licence)
-        const username = data.username
-        const email = data.email
-        const companyName = data.companyName
-        newData.forEach(el=>{
-          licecesData.push({ ...el,username, email,companyName}) 
-        })
-      });
-      resolve(licecesData)
+      resolve(dataToSent);
     } else {
       resolve([]);
     }
   });
 };
 
+const getLicences = async ({ limit, offset, newPage, lastPage }) => {
+  const ref = database.ref(SCHEMA.LICENCES);
+  const fetchDiffrence = newPage - lastPage;
+  lastVisible = offset === 0 ? "" : lastVisible;
+  if (!lastVisible) {
+    const result = await ref.orderByKey().limitToFirst(limit).once("value");
+    return result;
+  } else {
+    if (fetchDiffrence > 1) {
+      const result = await ref
+        .orderByKey()
+        .startAfter(lastVisible)
+        .limitToFirst((fetchDiffrence - 1) * limit)
+        .once("value");
+        if(result){
+          const values = result.val();
+          const keys = (values && Object.keys(values)) || [];
+          lastVisible = keys.length > 0 ? keys[keys.length - 1] : "";
+          const response = await ref
+          .orderByKey()
+          .startAfter(lastVisible)
+          .limitToFirst(limit)
+          .once("value");
+           return response;
 
+        }
+    } else if (fetchDiffrence < 0) {
+      const result = await ref
+        .orderByKey()
+        .limitToFirst((newPage - 1) * limit)
+        .once("value");
+        if(result){
+          const values = result.val();
+          const keys = (values && Object.keys(values)) || [];
+          lastVisible = keys.length > 0 ? keys[keys.length - 1] : "";
+          const reponse = await  ref
+            .orderByKey()
+            .startAfter(lastVisible)
+            .limitToFirst(limit)
+            .once("value");
+        return reponse;
+
+        }
+    } else {
+      const result = await ref
+        .orderByKey()
+        .startAfter(lastVisible)
+        .limitToFirst(limit)
+        .once("value");
+      return result;
+    }
+  }
+};
 
 export const getAllUsers = async (offset, limit, lastpage, newPage) => {
   const fetchDiffrence = newPage - lastpage;
@@ -257,9 +310,9 @@ export const getAllUsers = async (offset, limit, lastpage, newPage) => {
                   id: key,
                 };
                 data.push(res);
-                lastVisible = keys.length > 0 ? keys[keys.length - 1] : "";
                 resolve(data);
               });
+              lastVisible = keys.length > 0 ? keys[keys.length - 1] : "";
           } else {
             resolve([]);
           }
@@ -296,9 +349,9 @@ export const getAllUsers = async (offset, limit, lastpage, newPage) => {
                   id: key,
                 };
                 data.push(res);
-                lastVisible = keys.length > 0 ? keys[keys.length - 1] : "";
                 resolve(data);
               });
+              lastVisible = keys.length > 0 ? keys[keys.length - 1] : "";
           } else {
             resolve([]);
           }
@@ -743,13 +796,28 @@ export const getUser = (key, value) => {
   });
 };
 
+export const userLicences = (userId) => {
+  return new Promise((resolve, reject) => {
+    try {
+      database
+        .ref(SCHEMA.LICENCES)
+        .orderByChild("uid")
+        .equalTo(userId)
+        .once("value", (snapshot) => {
+          resolve(Object.values(snapshot.val() || {}));
+        });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 // updateUserLicence
 
 export const updateUserLicence = async (userId, data, callback) => {
   const licenceNo = data.id;
-  await database
-    .ref(SCHEMA.USERS + "/" + userId + "/licence/" + licenceNo)
-    .update(data);
+  console.log("licenceNolicenceNo=", licenceNo);
+  await database.ref(SCHEMA.LICENCES + "/" + licenceNo).update(data);
   callback(true);
 };
 
@@ -790,13 +858,20 @@ export const getTotalOfEmployerPost = () => {
 };
 
 export const addNewLicenceForUesr = async (userId, data, callback) => {
-  
-  await database.ref(SCHEMA.LICENCES).push()
+  console.log("datadata=", data);
+  let dataToAdd = {
+    ...data,
+    uid: userId,
+  };
   const licenceNo = data.id;
-  await database
-    .ref(SCHEMA.USERS + "/" + userId + "/licence/" + licenceNo)
-    .update(data);
+  await database.ref(SCHEMA.LICENCES + "/" + licenceNo).update(dataToAdd);
   callback(true);
+  // await database.ref(SCHEMA.LICENCES).push()
+  // const licenceNo = data.id;
+  // await database
+  //   .ref(SCHEMA.USERS + "/" + userId + "/licence/" + licenceNo)
+  //   .update(data);
+  // callback(true);
 };
 
 /**

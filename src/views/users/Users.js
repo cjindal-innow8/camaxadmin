@@ -114,7 +114,9 @@ const Users = (props) => {
           })
         }
      </table>
-    { (usersData && usersData.length > limit) && <Pagination
+    { 
+    (usersData && usersData.length > limit) &&
+     <Pagination
      className="mt-3 mx-auto w-fit-content"
      itemClass="page-item"
      linkClass="page-link"
