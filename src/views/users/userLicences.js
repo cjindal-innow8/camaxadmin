@@ -14,7 +14,6 @@ import {
 import moment from 'moment'
 function UserLicences(props) {
   const { handleClick, licences ,handleEdit,handleDelete,} = props
-  console.log("licenceslicenceslicences", licences)
   return (
     <CRow>
       <CCol lg={8}>

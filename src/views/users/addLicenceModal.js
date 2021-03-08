@@ -19,7 +19,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 function AddLicenceModal(props) {
-  const { handleChange, availableProduct, isOpen, values,toggleModal, OnAdd, changeDate, isEdit} = props
+  const { handleChange, availableProduct, isOpen, values,toggleModal, OnAdd, changeDate, isEdit,setAmcAmount} = props
   const [products, setProducts] = useState([])
   useEffect(() => {
     if (props.availableProduct) {
@@ -27,6 +27,7 @@ function AddLicenceModal(props) {
       const data = availableProduct.map(el => {
         return el.productName
       })
+      
       setProducts(data)
     }
   }, [props])

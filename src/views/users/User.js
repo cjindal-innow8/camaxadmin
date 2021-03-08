@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton, CAlert, CLabel } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { getUser, addNewLicenecForUesr, getProducts ,updateUserLicence,deleteUserLicenceKey} from '../../firebase/firebasedb'
+import { getUser, addNewLicenceForUesr, getProducts ,updateUserLicence,deleteUserLicenceKey} from '../../firebase/firebasedb'
 import moment from 'moment'
 import { generateLicenceKey } from '../../utilities/generateLicence'
 import AddLicenceModal from './addLicenceModal'
@@ -12,11 +12,11 @@ import Loader from '../../utilities/loader/index.js'
 const formDetail = {
   licenceKey: "",
   productName: "",
-  expiryDate: ""
+  expiryDate: "",
+  amcAmount : "",
 }
 // import usersData from './UsersData'
 const User = (props) => {
-  console.log("UserUser=", props)
   const history = useHistory()
   const [userData, setUserData] = useState()
   const [licences, setLicences] = useState()
@@ -25,6 +25,7 @@ const User = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [availableProduct, setAvailableProduct] = useState();
+  const [amcAmount , setAmcAmount] = useState()
  
   useEffect(() => {
     getUserDeatail()
@@ -70,16 +71,13 @@ const User = (props) => {
   }
   const addLicence = async (data) => {
     const userId = userData && userData[0].uid
-    console.log("datadatadata=",data)
     const licenceDetail = {
       id: data.licenceKey,
       expiryDate: data.expiryDate.getTime(),
       productName : data.productName,
       // price: amount,
     };
-    console.log("licenceDetaillicenceDetail=",licenceDetail)
-
-    addNewLicenecForUesr(userId, licenceDetail,(res)=>{
+    addNewLicenceForUesr(userId, licenceDetail,(res)=>{
       if(res){
       Alert(200, "Licence Added Successfully!!");
       getUserDeatail()
@@ -88,7 +86,6 @@ const User = (props) => {
   }
 
   const updateLicence = (data)=>{
-    console.log("updateLicenceupdateLicence=",data)
     const userId = userData && userData[0].uid
     const licenceDetail = {
       id: data.licenceKey,
@@ -136,7 +133,7 @@ const User = (props) => {
 
   const handleChange = (event) => {
     // console.log("eventeventevent=",event)
-    console.log("eventevent=", event.target.value)
+    console.log("eventevent=", event.target)
     const key = event.target.id;
     const value = event.target.value;
     setFields((prevState) => ({
@@ -180,13 +177,12 @@ const User = (props) => {
     getLicenceKey()
   }
 
-  console.log("fieldsfieldsfields=", fields)
-
 
   return (
     <>
    {isLoading && <Loader/>}
       <CRow>
+      
         <CCol lg={8}>
 
           <CButton
@@ -219,7 +215,7 @@ const User = (props) => {
       <CRow>
         <CCol>
           <UserLicences licences={licences} handleClick={handleClick} handleEdit = {handleEdit} handleDelete = {handleDelete}/>
-          <AddLicenceModal isOpen={isOpen} availableProduct={availableProduct} values={fields} isEdit={isEdit}
+          <AddLicenceModal isOpen={isOpen} availableProduct={availableProduct} values={fields} isEdit={isEdit} setAmcAmount = {setAmcAmount}
           handleChange={handleChange} toggleModal={toggleModal} OnAdd={OnAdd} changeDate = {changeDate} />
         </CCol>
       </CRow>

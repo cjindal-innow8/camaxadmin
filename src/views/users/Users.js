@@ -3,16 +3,10 @@ import { useHistory, useLocation } from 'react-router-dom'
 import Loader from '../../utilities/loader/index.js'
 import Pagination from "react-js-pagination";
 import {
-  CBadge,
-  CCard,
-  CCardBody,
-  CCardHeader,
-  CCol,
-  CDataTable,
-  CRow,
-  CPagination,
+  CButton,
   CInput
 } from '@coreui/react'
+import EmailContentModal from './emailContentModal'
 import {getAllUsers,getTotalUser} from '../../firebase/firebasedb'
 let intialData ;
 let limit = 10
@@ -24,6 +18,8 @@ const Users = (props) => {
   const [usersData,setuserData] = useState([])
   const [headings , setHeadings] = useState([])
  const [isLoading, setIsLoading] = useState(false)
+ const [isOpen, setIsOpen] = useState(false)
+
   const getUserData = async(pageNumber)=>{
     setIsLoading(true)
     const offset = (pageNumber - 1) *  limit 
@@ -34,12 +30,14 @@ const Users = (props) => {
     setIsLoading(false)
     // setTotalData(result.totalData)
   }
+
   const getUserCount = async ()=>{
     setIsLoading(true)
     const result = await getTotalUser()
     setTotalData(result.totalData)
     setIsLoading(false)
   }
+
   useEffect(()=>{
     getUserCount()
     getUserData(page)
@@ -48,11 +46,13 @@ const Users = (props) => {
   const pageChange = (pagenumber)=>{
     setPage(pagenumber)
     getUserData(pagenumber)
+  }
 
+  const toggleModal = ()=>{
+    setIsOpen(!isOpen)
   }
 
   const goToUser = (user)=>{
-    console.log("useruser=",user)
     props.history.push(`/user/${user.uid}`)
   }
 
@@ -82,7 +82,8 @@ const Users = (props) => {
   }
 
   return (
-   <div>
+   <div >
+      <CButton className="text-right" color = "primary"  onClick = {()=>{setIsOpen(true)}}> Send Email </CButton>
      <div>
        
      <CInput className="search-input" onChange = {handleSearch} placeholder = "Search" />
@@ -121,7 +122,7 @@ const Users = (props) => {
      activePage={page}
      itemsCountPerPage={limit}
      totalItemsCount={totaldata}
-    //  pageRangeDisplayed={5}
+     pageRangeDisplayed={5}
      onChange={pageChange}
    />}
    </>
@@ -129,6 +130,7 @@ const Users = (props) => {
       No Data
       </div>
      }
+     <EmailContentModal toggleModal= {toggleModal} isOpen = {isOpen}/>
     </div>
   )
 }

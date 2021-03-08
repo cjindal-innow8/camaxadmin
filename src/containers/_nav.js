@@ -10,6 +10,13 @@ const _nav =  [
     to: '/users',
     icon: 'cil-drop',
   },
+
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Licences',
+    to: '/transactions',
+    icon: 'cil-drop',
+  },
   {
     _tag: 'CSidebarNavItem',
     name: 'OpenJobs',
